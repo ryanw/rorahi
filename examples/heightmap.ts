@@ -46,7 +46,6 @@ function main() {
 	let start = performance.now();
 	let end = performance.now();
 	function animate() {
-		camera.rotate(Math.PI * dt / 30, 0);
 		chart.draw();
 		end = performance.now();
 		chart.data = generateData(0, 0, SIZE, SIZE, performance.now() / 14000);

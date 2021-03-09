@@ -207,9 +207,20 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
 
 		// Draw flat projection
+
+		// Floor
 		gl.uniform1i(flatUniform, 1);
-		const flatTransform = Matrix4.translation(0, -0.5, 0).multiply(this.transform);
+		let flatTransform = Matrix4.translation(0, -0.5, 0).multiply(this.transform);
 		gl.uniformMatrix4fv(modelUniform, false, flatTransform.toArray());
+		gl.enable(gl.CULL_FACE);
+		gl.cullFace(gl.BACK);
+		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
+
+		// Ceiling
+		flatTransform = Matrix4.translation(0, 0.5, 0).multiply(this.transform);
+		gl.uniformMatrix4fv(modelUniform, false, flatTransform.toArray());
+		gl.enable(gl.CULL_FACE);
+		gl.cullFace(gl.FRONT);
 		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
 	}
 }

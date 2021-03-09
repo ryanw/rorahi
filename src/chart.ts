@@ -46,6 +46,7 @@ export class Chart<T extends ArrayLike<number>> {
 	private _gl: WebGLRenderingContext;
 	private _items: ChartElement[] = [];
 	private _resizeObserver: ResizeObserver;
+	private _mouseEnabled = true;
 	readonly gradient: Gradient;
 	camera = new Camera();
 
@@ -115,6 +116,16 @@ export class Chart<T extends ArrayLike<number>> {
 		return this._data.length / this._dataWidth;
 	}
 
+	enableMouse() {
+		this._mouseEnabled = true;
+		this.attachMouseListeners();
+	}
+
+	disableMouse() {
+		this._mouseEnabled = false;
+		this.detachMouseListeners();
+	}
+
 	getData(x: number, y: number): number {
 		const i = x + y * this._dataWidth;
 		return this.data[i];
@@ -140,14 +151,49 @@ export class Chart<T extends ArrayLike<number>> {
 	}
 
 	private attachListeners() {
+		this.detachListeners();
 		if ('ResizeObserver' in window) {
 			this._resizeObserver = new ResizeObserver(() => this.updateSize());
 			this._resizeObserver.observe(this._container);
+		}
+		if (this._mouseEnabled) {
+			this.attachMouseListeners();
 		}
 	}
 
 	private detachListeners() {
 		this._resizeObserver?.unobserve(this._container);
+		this.detachMouseListeners();
+	}
+
+	private attachMouseListeners() {
+		if (!this._canvas) return;
+		this._canvas.addEventListener('mousedown', this.onMouseDown);
+	}
+
+	private detachMouseListeners() {
+		this._canvas.removeEventListener('mousedown', this.onMouseDown);
+		window.removeEventListener('mousemove', this.onMouseMove);
+		window.removeEventListener('mouseup', this.onMouseUp);
+	}
+
+	private onMouseDown = () => {
+		window.addEventListener('mousemove', this.onMouseMove);
+		window.addEventListener('mouseup', this.onMouseUp);
+	}
+
+	private onMouseUp = () => {
+		window.removeEventListener('mousemove', this.onMouseMove);
+		window.removeEventListener('mouseup', this.onMouseUp);
+	}
+
+	private onMouseMove = (e: MouseEvent) => {
+		const mouseSpeed = 0.005;
+		const { movementX: mX, movementY: mY } = e;
+		const x = -mX * mouseSpeed;
+		const y = -mY * mouseSpeed;
+
+		this.camera.rotate(x, y);
 	}
 
 	update() {
