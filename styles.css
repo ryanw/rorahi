@@ -1,0 +1,24 @@
+* {
+	box-sizing: border-box;
+}
+html {
+	height: 100%;
+	padding: 0;
+	margin: 0;
+}
+body {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+	margin: 0;
+	align-items: center;
+	justify-content: center;
+}
+#example-graph {
+	width: 95%;
+	height: 95%;
+	background: #eee;
+	border-radius: 8px;
+	box-shadow: 0 4px 10px 1px rgba(0, 0, 0, 0.3);
+}

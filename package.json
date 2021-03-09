@@ -1,0 +1,31 @@
+{
+  "name": "rorahi",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "server": "webpack serve",
+    "build": "webpack",
+    "docs": "typedoc",
+    "test": "jest src",
+	"pretty": "prettier -w src"
+  },
+  "author": "Ryan Williams <git@ryan.nz>",
+  "license": "MIT",
+  "devDependencies": {
+    "glslify-loader": "^2.0.0",
+    "jest": "^26.5.2",
+    "jest-extended": "^0.11.5",
+    "prettier": "^2.2.1",
+    "raw-loader": "^4.0.1",
+    "ts-jest": "^26.4.1",
+    "ts-loader": "^8.0.2",
+    "typedoc": "^0.20.24",
+    "typescript": "^3.9.7",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^4.0.0",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {}
+}

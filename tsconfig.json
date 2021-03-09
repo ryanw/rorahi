@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"outDir": "./dist/",
+		"declaration": true,
+		"sourceMap": true,
+		"allowJs": true,
+		"noImplicitAny": true,
+		"esModuleInterop": true,
+		"module": "esnext",
+		"moduleResolution": "node",
+		"target": "es6",
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": "./",
+		"paths": {
+			// For examples
+			"rorahi": ["src/index"]
+		}
+	}
+}
