@@ -2,6 +2,7 @@ import { Matrix4 } from './geom';
 import { Camera } from './camera';
 import { Heightmap } from './elements/heightmap';
 import { Walls } from './elements/walls';
+import { Label, LabelAlign } from './elements/label';
 import { AxisMarkers } from './elements/axis_markers';
 import { RGB } from './color';
 import { Gradient } from './gradient';
@@ -76,7 +77,56 @@ export class Chart<T extends ArrayLike<number>> {
 		heightmap.transform = Matrix4.rotation(-Math.PI / 2, 0, 0);
 		this._items.push(heightmap);
 
+		// Walls
 		this._items.push(new Walls(this));
+
+		// X Marker Labels
+		for (let i = 0; i < 17; i++) {
+			const labelTrans = Matrix4.identity()
+				.multiply(Matrix4.translation(-0.5 + (i * (1/16)), -0.5, 0.55))
+				.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
+				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
+			const label = new Label({
+				text: `${i}`,
+				fontSize: 48,
+				color: [1.0, 0.0, 0.0],
+				align: LabelAlign.RIGHT,
+				transform: labelTrans,
+			});
+			this._items.push(label);
+		}
+
+		// Y (up) Marker Labels
+		for (let i = 1; i < 10; i++) {
+			const labelTrans = Matrix4.identity()
+				.multiply(Matrix4.translation(-0.5, -0.5 + (i * (1/9)), 0.55))
+				//.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
+				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
+			const label = new Label({
+				text: `${i}`,
+				fontSize: 48,
+				color: [0.0, 0.6, 0.0],
+				align: LabelAlign.RIGHT,
+				transform: labelTrans,
+			});
+			this._items.push(label);
+		}
+
+		// Z (forward) Marker Labels
+		for (let i = 0; i < 17; i++) {
+			const labelTrans = Matrix4.identity()
+				.multiply(Matrix4.translation(0.57, -0.5, 0.50 - (i * (1/16))))
+				.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
+				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
+			const label = new Label({
+				text: `${i}`,
+				fontSize: 48,
+				color: [0.0, 0.0, 1.0],
+				align: LabelAlign.CENTER,
+				transform: labelTrans,
+			});
+			this._items.push(label);
+		}
 
 		// X axis
 		this._items.push(new AxisMarkers(this, 16));
@@ -89,6 +139,7 @@ export class Chart<T extends ArrayLike<number>> {
 		// Y axis (up)
 		//this._items.push(new AxisMarkers(this, this.gradient.length, Matrix4.rotation(0, 0, -Math.PI / 2)));
 		this._items.push(new AxisMarkers(this, this.gradient.length, Matrix4.rotation(0, 0, -Math.PI / 2)));
+
 	}
 
 	get gl(): WebGLRenderingContext | null {
@@ -145,7 +196,7 @@ export class Chart<T extends ArrayLike<number>> {
 
 		gl.enable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
-		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 		this._gl = gl;
 	}

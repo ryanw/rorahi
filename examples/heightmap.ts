@@ -39,9 +39,9 @@ function main() {
 	chart.attach('#example-graph');
 
 	const camera: Camera = chart.camera;
-	camera.distance = 2;
+	camera.distance = 2.5;
 	camera.rotate(0, -Math.PI * 0.2);
-	camera.rotate(Math.PI * 0.1, 0);
+	camera.rotate(Math.PI * 0.3, 0);
 	let dt = 0;
 	let start = performance.now();
 	let end = performance.now();

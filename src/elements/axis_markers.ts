@@ -36,7 +36,8 @@ export class AxisMarkers implements ChartElement {
 		const transform = Matrix4.identity()
 			.multiply(Matrix4.translation(0, -1, 0.52))
 			.multiply(Matrix4.scaling(1.01, 1.0, 0.3))
-			.multiply(Matrix4.translation(0, 0, 0.5));
+			.multiply(Matrix4.translation(0, 0, 0.5))
+			.multiply(Matrix4.scaling(0.5001));
 		const [positions] = createFace([0, 1, 0], transform);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);

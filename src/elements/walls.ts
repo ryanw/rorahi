@@ -31,12 +31,13 @@ export class Walls implements ChartElement {
 		this._positionBuffer = gl.createBuffer();
 		this._barycentricBuffer = gl.createBuffer();
 
-		const [p0, b0] = createFace([1.0, 0.0, 0.0]);
-		const [p1, b1] = createFace([-1.0, 0.0, 0.0]);
-		const [p2, b2] = createFace([0.0, 1.0, 0.0]);
-		const [p3, b3] = createFace([0.0, -1.0, 0.0]);
-		const [p4, b4] = createFace([0.0, 0.0, 1.0]);
-		const [p5, b5] = createFace([0.0, 0.0, -1.0]);
+		const scale = Matrix4.scaling(0.5001)
+		const [p0, b0] = createFace([1.0, 0.0, 0.0], scale);
+		const [p1, b1] = createFace([-1.0, 0.0, 0.0], scale);
+		const [p2, b2] = createFace([0.0, 1.0, 0.0], scale);
+		const [p3, b3] = createFace([0.0, -1.0, 0.0], scale);
+		const [p4, b4] = createFace([0.0, 0.0, 1.0], scale);
+		const [p5, b5] = createFace([0.0, 0.0, -1.0], scale);
 
 		const positions = [...p0, ...p1, ...p2, ...p3, ...p4, ...p5];
 		const barycentrics = [...b0, ...b1, ...b2, ...b3, ...b4, ...b5];
