@@ -2,13 +2,14 @@ import { Chart, ChartElement } from '../chart';
 import { Matrix4 } from '../geom';
 import { Camera } from '../camera';
 import { createFace } from '../meshes';
+import { Program } from '../program';
 import WallsVertexShader from '../shaders/walls.vert.glsl';
 import WallsFragmentShader from '../shaders/walls.frag.glsl';
 
 export class Walls implements ChartElement {
 	private _positionBuffer: WebGLBuffer;
 	private _barycentricBuffer: WebGLBuffer;
-	private _program: WebGLProgram;
+	private _program: Program;
 	private _chart: Chart<any>;
 	transform = Matrix4.identity();
 
@@ -17,33 +18,8 @@ export class Walls implements ChartElement {
 	}
 
 	private compileShaders(gl: WebGLRenderingContext) {
-		const program = gl.createProgram();
-
-		const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-		gl.shaderSource(vertexShader, WallsVertexShader);
-		gl.attachShader(program, vertexShader);
-		gl.compileShader(vertexShader);
-		if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-			const info = gl.getShaderInfoLog(vertexShader);
-			throw `Could not compile Vertex shader: ${info}`;
-		}
-
-		const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-		gl.shaderSource(fragmentShader, WallsFragmentShader);
-		gl.attachShader(program, fragmentShader);
-		gl.compileShader(fragmentShader);
-		if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-			const info = gl.getShaderInfoLog(fragmentShader);
-			throw `Could not compile Fragment shader: ${info}`;
-		}
-
-		gl.linkProgram(program);
-		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-			const info = gl.getProgramInfoLog(program);
-			throw `Could not link WebGL program: ${info}`;
-		}
-
-		this._program = program;
+		this._program = new Program(gl, WallsVertexShader, WallsFragmentShader);
+		this._program.compile();
 	}
 
 	update(gl: WebGLRenderingContext) {
@@ -72,32 +48,22 @@ export class Walls implements ChartElement {
 	}
 
 	draw(gl: WebGLRenderingContext, camera: Camera) {
-		gl.useProgram(this._program);
+		const prog = this._program;
+		prog.use();
 
 		const colors = this._chart.gradient.colors;
 
 		// attribute vec3 position
-		const positionAttr = gl.getAttribLocation(this._program, 'position');
-		gl.enableVertexAttribArray(positionAttr);
-		gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer);
-		gl.vertexAttribPointer(positionAttr, 3, gl.FLOAT, false, 0, 0);
+		prog.bindPositionBuffer(this._positionBuffer);
 
 		// attribute vec3 barycentric
-		const barycentricAttr = gl.getAttribLocation(this._program, 'barycentric');
-		gl.enableVertexAttribArray(barycentricAttr);
-		gl.bindBuffer(gl.ARRAY_BUFFER, this._barycentricBuffer);
-		gl.vertexAttribPointer(barycentricAttr, 3, gl.FLOAT, false, 0, 0);
+		prog.bindAttribute('barycentric', this._barycentricBuffer, 3);
 
 		// Camera uniforms
-		const modelUniform = gl.getUniformLocation(this._program, 'u_model');
-		gl.uniformMatrix4fv(modelUniform, false, this.transform.toArray());
-		const viewUniform = gl.getUniformLocation(this._program, 'u_view');
-		gl.uniformMatrix4fv(viewUniform, false, camera.view.inverse().toArray());
-		const projUniform = gl.getUniformLocation(this._program, 'u_projection');
-		gl.uniformMatrix4fv(projUniform, false, camera.projection.toArray());
+		prog.setCamera(camera);
+		prog.setUniform('u_model', this.transform);
 
-		const intervalCountUniform = gl.getUniformLocation(this._program, 'u_intervalCount');
-		gl.uniform1i(intervalCountUniform, colors.length);
+		prog.setUniform('u_intervalCount', colors.length, gl.INT);
 
 		const vertexCount = 6 * 6;
 

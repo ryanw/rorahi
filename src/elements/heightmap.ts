@@ -1,6 +1,7 @@
 import { Chart, ChartElement } from '../chart';
 import { Matrix4 } from '../geom';
 import { Camera } from '../camera';
+import { Program } from '../program';
 import HeightmapVertexShader from '../shaders/heightmap.vert.glsl';
 import HeightmapFragmentShader from '../shaders/heightmap.frag.glsl';
 
@@ -9,7 +10,7 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 	private _indexBuffer: WebGLBuffer;
 	private _width: number;
 	private _height: number;
-	private _program: WebGLProgram;
+	private _program: Program;
 	private _heightTexture: WebGLTexture;
 	private _chart: Chart<T>;
 	private _useFloatTextures: boolean = false;
@@ -30,33 +31,8 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		this._useFloatTextures = Boolean(gl.getExtension('OES_texture_float'));
 		this._useLinearFilter = Boolean(gl.getExtension('OES_texture_float_linear'));
 
-		const program = gl.createProgram();
-
-		const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-		gl.shaderSource(vertexShader, HeightmapVertexShader);
-		gl.attachShader(program, vertexShader);
-		gl.compileShader(vertexShader);
-		if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-			const info = gl.getShaderInfoLog(vertexShader);
-			throw `Could not compile Vertex shader: ${info}`;
-		}
-
-		const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-		gl.shaderSource(fragmentShader, HeightmapFragmentShader);
-		gl.attachShader(program, fragmentShader);
-		gl.compileShader(fragmentShader);
-		if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-			const info = gl.getShaderInfoLog(fragmentShader);
-			throw `Could not compile Fragment shader: ${info}`;
-		}
-
-		gl.linkProgram(program);
-		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-			const info = gl.getProgramInfoLog(program);
-			throw `Could not link WebGL program: ${info}`;
-		}
-
-		this._program = program;
+		this._program = new Program(gl, HeightmapVertexShader, HeightmapFragmentShader);
+		this._program.compile();
 	}
 
 	update(gl: WebGLRenderingContext) {
@@ -163,63 +139,51 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 	}
 
 	draw(gl: WebGLRenderingContext, camera: Camera) {
-		gl.useProgram(this._program);
+		const prog = this._program;
+		prog.use();
 
 		const colors = this._chart.gradient.colors;
 
 		// attribute vec3 position
-		const positionAttr = gl.getAttribLocation(this._program, 'position');
-		gl.enableVertexAttribArray(positionAttr);
-		gl.bindBuffer(gl.ARRAY_BUFFER, this._vertexBuffer);
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
-		gl.vertexAttribPointer(positionAttr, 3, gl.FLOAT, false, 0, 0);
+		prog.bindPositionBuffer(this._vertexBuffer, this._indexBuffer);
 
 		// Camera uniforms
-		const modelUniform = gl.getUniformLocation(this._program, 'u_model');
-		gl.uniformMatrix4fv(modelUniform, false, this.transform.toArray());
-		const viewUniform = gl.getUniformLocation(this._program, 'u_view');
-		gl.uniformMatrix4fv(viewUniform, false, camera.view.inverse().toArray());
-		const projUniform = gl.getUniformLocation(this._program, 'u_projection');
-		gl.uniformMatrix4fv(projUniform, false, camera.projection.toArray());
+		prog.setCamera(camera);
+		prog.setUniform('u_model', this.transform);
 
 		// Colour intervals
-		const intervalCountUniform = gl.getUniformLocation(this._program, 'u_intervalCount');
-		gl.uniform1i(intervalCountUniform, colors.length);
+		prog.setUniform('u_intervalCount', colors.length, gl.INT);
 		for (let i = 0; i < colors.length; i++) {
-			const intervalsUniform = gl.getUniformLocation(this._program, `u_intervals[${i}]`);
-			gl.uniform3fv(intervalsUniform, colors[i]);
+			prog.setUniform(`u_intervals[${i}]`, colors[i]);
 		}
 
 		// Height map texture
-		const heightsUniform = gl.getUniformLocation(this._program, 'u_heights');
-		gl.uniform1i(heightsUniform, 0);
-
-		gl.activeTexture(gl.TEXTURE0);
+		const textureUnit = 0;
+		prog.setUniform('u_heights', textureUnit, gl.INT);
+		gl.activeTexture(gl.TEXTURE0 + textureUnit);
 		gl.bindTexture(gl.TEXTURE_2D, this._heightTexture);
 
 		const vertexCount = this._width * this._height * 6;
 
 		gl.disable(gl.CULL_FACE);
 
-		const flatUniform = gl.getUniformLocation(this._program, 'u_flat');
-
 		// Draw 3D surface
-		gl.uniform1i(flatUniform, 0);
+		prog.setUniform('u_flat', false);
 		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
 
-		// Draw flat projection
+		// Draw flat projections
+		prog.setUniform('u_flat', true);
 
 		// Floor
-		gl.uniform1i(flatUniform, 1);
 		let flatTransform = Matrix4.translation(0, -0.5, 0).multiply(this.transform);
-		gl.uniformMatrix4fv(modelUniform, false, flatTransform.toArray());
+		prog.setUniform('u_model', flatTransform);
 		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.BACK);
 		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
 
 		// Ceiling
 		flatTransform = Matrix4.translation(0, 0.5, 0).multiply(this.transform);
-		gl.uniformMatrix4fv(modelUniform, false, flatTransform.toArray());
+		prog.setUniform('u_model', flatTransform);
 		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.FRONT);
 		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
