@@ -13,6 +13,7 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 	private _heightTexture: WebGLTexture;
 	private _chart: Chart<T>;
 	private _useFloatTextures: boolean = false;
+	private _useLinearFilter: boolean = true;
 	transform: Matrix4 = Matrix4.identity();
 
 	constructor(chart: Chart<T>, width: number, height: number) {
@@ -26,8 +27,8 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 
 	private compileShaders(gl: WebGLRenderingContext) {
 		// Enable float textures if supported, 32bit per channel instead of 8bit
-		const ext = gl.getExtension('OES_texture_float');
-		this._useFloatTextures = Boolean(ext);
+		this._useFloatTextures = Boolean(gl.getExtension('OES_texture_float'));
+		this._useLinearFilter = Boolean(gl.getExtension('OES_texture_float_linear'));
 
 		const program = gl.createProgram();
 
@@ -157,8 +158,8 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._useLinearFilter ? gl.LINEAR : gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this._useLinearFilter ? gl.LINEAR : gl.NEAREST);
 	}
 
 	draw(gl: WebGLRenderingContext, camera: Camera) {
