@@ -1,4 +1,4 @@
-import { Matrix4 } from './geom';
+import { Matrix4, Point2, Point3 } from './geom';
 import { Camera } from './camera';
 import { Heightmap } from './elements/heightmap';
 import { Walls } from './elements/walls';
@@ -139,7 +139,6 @@ export class Chart<T extends ArrayLike<number>> {
 		// Y axis (up)
 		//this._items.push(new AxisMarkers(this, this.gradient.length, Matrix4.rotation(0, 0, -Math.PI / 2)));
 		this._items.push(new AxisMarkers(this, this.gradient.length, Matrix4.rotation(0, 0, -Math.PI / 2)));
-
 	}
 
 	get gl(): WebGLRenderingContext | null {
@@ -165,6 +164,20 @@ export class Chart<T extends ArrayLike<number>> {
 
 	get dataHeight(): number {
 		return this._data.length / this._dataWidth;
+	}
+
+	pointToPixel(p: Point3): Point2 {
+		const view = this.camera.view.inverse();
+		const proj = this.camera.projection;
+		const viewProj = proj.multiply(view);
+		const pixel = viewProj.transformPoint3(p);
+		const { clientWidth: width, clientHeight: height } = this._container;
+
+		const hw = width / 2;
+		const hh = height / 2;
+		const x = pixel[0];
+		const y = pixel[1];
+		return [x * hw + hw, -y * hh + hh];
 	}
 
 	enableMouse() {

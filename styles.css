@@ -16,6 +16,7 @@ body {
 	justify-content: center;
 }
 #example-graph {
+	position: relative;
 	width: 95%;
 	height: 95%;
 	background: #eee;

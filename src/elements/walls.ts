@@ -31,16 +31,14 @@ export class Walls implements ChartElement {
 		this._positionBuffer = gl.createBuffer();
 		this._barycentricBuffer = gl.createBuffer();
 
-		const scale = Matrix4.scaling(0.5001)
+		const scale = Matrix4.scaling(0.5)
 		const [p0, b0] = createFace([1.0, 0.0, 0.0], scale);
 		const [p1, b1] = createFace([-1.0, 0.0, 0.0], scale);
-		const [p2, b2] = createFace([0.0, 1.0, 0.0], scale);
-		const [p3, b3] = createFace([0.0, -1.0, 0.0], scale);
-		const [p4, b4] = createFace([0.0, 0.0, 1.0], scale);
-		const [p5, b5] = createFace([0.0, 0.0, -1.0], scale);
+		const [p2, b2] = createFace([0.0, 0.0, 1.0], scale);
+		const [p3, b3] = createFace([0.0, 0.0, -1.0], scale);
 
-		const positions = [...p0, ...p1, ...p2, ...p3, ...p4, ...p5];
-		const barycentrics = [...b0, ...b1, ...b2, ...b3, ...b4, ...b5];
+		const positions = [...p0, ...p1, ...p2, ...p3];
+		const barycentrics = [...b0, ...b1, ...b2, ...b3];
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -66,7 +64,7 @@ export class Walls implements ChartElement {
 
 		prog.setUniform('u_intervalCount', colors.length, gl.INT);
 
-		const vertexCount = 6 * 6;
+		const vertexCount = 6 * 4;
 
 		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.FRONT);
