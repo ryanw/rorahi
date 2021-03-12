@@ -1,15 +1,21 @@
 import { Chart, Camera } from 'rorahi';
 import SimplexNoise from './simplex-noise';
 
-const SIZE = 128;
+const SIZE = 200;
 function main() {
-	const data = generateData(0, 0, SIZE, SIZE);
+	const width = parseFloat((document.querySelector('#x-scale') as HTMLInputElement).value);
+	const height = parseFloat((document.querySelector('#y-scale') as HTMLInputElement).value);
+	const xOffset = parseFloat((document.querySelector('#x-offset') as HTMLInputElement).value);
+	const yOffset = parseFloat((document.querySelector('#y-offset') as HTMLInputElement).value);
+
+	const data = generateData(0, 0, SIZE, SIZE, 1.0);
 	console.debug("DATA", data);
 	const chart = new Chart({
 		data,
 		dataWidth: SIZE,
 		origin: [0, 0, 0],
-		resolution: 64,
+		resolution: 128,
+		region: [xOffset, yOffset, width, height],
 		axes: {
 			x: {
 				label: 'Foo',
@@ -39,21 +45,41 @@ function main() {
 	chart.attach('#example-graph');
 
 	const camera: Camera = chart.camera;
-	camera.distance = 2;
+	camera.distance = 3;
 	camera.rotate(0, -Math.PI * 0.2);
 	camera.rotate(Math.PI * 0.1, 0);
-	let dt = 0;
-	let start = performance.now();
-	let end = performance.now();
-	function animate() {
-		chart.draw();
-		end = performance.now();
-		chart.data = generateData(0, 0, SIZE, SIZE, performance.now() / 14000);
-		window.requestAnimationFrame(animate);
-		dt = (end - start) / 1000;
-		start = end;
-	}
-	animate();
+
+
+	// Time adjustment
+	document.querySelector('#time-range').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = parseFloat(el.value);
+		chart.data = generateData(0, 0, SIZE, SIZE, value);
+	});
+
+	document.querySelector('#x-scale').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = parseFloat(el.value);
+		chart.xWidth = value;
+	});
+
+	document.querySelector('#y-scale').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = parseFloat(el.value);
+		chart.yWidth = value;
+	});
+
+	document.querySelector('#x-offset').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = parseFloat(el.value);
+		chart.xOffset = value;
+	});
+
+	document.querySelector('#y-offset').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = parseFloat(el.value);
+		chart.yOffset = value;
+	});
 }
 
 
@@ -69,10 +95,10 @@ function generateData(startX: number, startY: number, width: number, height: num
 
 	const scale = 40;
 	function noise(x: number, y: number): number {
-		let n = simplex.noise3D(x / scale, y / scale, t);
-		n *= 1.0 - simplex2.noise3D(x / scale * 2, y / scale * 2, t) / 2;
+		let n = simplex.noise3D(x / scale, y / scale, t) * 1.5;
+		n *= 1.0 - simplex2.noise3D(x / scale * 2, y / scale * 2, t) / 3;
 
-		return n * 0.5 + 0.5;
+		return n * 0.3 + 0.5;
 	}
 
 	for (let y = 0; y < height; y++) {

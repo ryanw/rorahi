@@ -1,4 +1,4 @@
-import { Matrix4, Point2, Point3 } from './geom';
+import { Matrix4, Point2, Point3, Rect } from './geom';
 import { Camera } from './camera';
 import { Heightmap } from './elements/heightmap';
 import { Walls } from './elements/walls';
@@ -21,6 +21,7 @@ export interface ChartOptions<T extends ArrayLike<number>> {
 	origin?: [number, number, number];
 	resolution?: number;
 	gradient?: Gradient | RGB[];
+	region?: Rect;
 	axes?: {
 		x?: AxisOptions;
 		y?: AxisOptions;
@@ -51,6 +52,7 @@ export class Chart<T extends ArrayLike<number>> {
 	private _items: ChartElement[] = [];
 	private _resizeObserver: ResizeObserver;
 	private _mouseEnabled = true;
+	private _region: Rect = [0, 0, 0, 0];
 	readonly gradient: Gradient;
 	camera = new Camera();
 
@@ -62,6 +64,14 @@ export class Chart<T extends ArrayLike<number>> {
 		if (options?.dataWidth) {
 			this._dataWidth = options.dataWidth;
 		}
+
+		if (options?.region) {
+			this._region = [...options.region];
+		}
+		else if (options?.data && options?.dataWidth) {
+			this._region = [0, 0, options.dataWidth, options.data.length / options.dataWidth];
+		}
+
 		if (options?.gradient) {
 			if (options.gradient instanceof Gradient) {
 				this.gradient = options.gradient;
@@ -165,9 +175,44 @@ export class Chart<T extends ArrayLike<number>> {
 		return this._data;
 	}
 
+	get region(): Rect {
+		return [...this._region];
+	}
+
+	set region(rect: Rect) {
+		this._region = [...rect];
+		this.update();
+		this.draw();
+	}
+
 	set data(newData: T) {
 		this._data = newData;
-		this.update?.();
+		this.update();
+		this.draw();
+	}
+
+	set xOffset(value: number) {
+		this._region[0] = value;
+		this.update();
+		this.draw();
+	}
+
+	set yOffset(value: number) {
+		this._region[1] = value;
+		this.update();
+		this.draw();
+	}
+
+	set xWidth(value: number) {
+		this._region[2] = value;
+		this.update();
+		this.draw();
+	}
+
+	set yWidth(value: number) {
+		this._region[3] = value;
+		this.update();
+		this.draw();
 	}
 
 	get dataWidth(): number {
@@ -203,6 +248,12 @@ export class Chart<T extends ArrayLike<number>> {
 	}
 
 	getData(x: number, y: number): number {
+		if (x > this._region[2]) return null;
+		if (y > this._region[3]) return null;
+		x += this._region[0];
+		y += this._region[1];
+		if (x > this.dataWidth) return null;
+		if (y > this.dataHeight) return null;
 		const i = x + y * this._dataWidth;
 		return this.data[i];
 	}
@@ -274,6 +325,7 @@ export class Chart<T extends ArrayLike<number>> {
 		const y = -mY * mouseSpeed;
 
 		this.camera.rotate(x, y);
+		this.draw();
 	}
 
 	private onWheel = (e: ExtWheelEvent) => {
@@ -307,6 +359,7 @@ export class Chart<T extends ArrayLike<number>> {
 		else if (this.camera.distance > 8) {
 			this.camera.distance = 8;
 		}
+		this.draw();
 	};
 
 	update() {
@@ -317,6 +370,7 @@ export class Chart<T extends ArrayLike<number>> {
 
 	draw() {
 		const gl = this.gl;
+		if (!gl) return;
 		gl.clearDepth(1.0);
 		gl.clearColor(0.0, 0.0, 0.0, 0.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -355,5 +409,7 @@ export class Chart<T extends ArrayLike<number>> {
 		this._canvas.height = deviceHeight;
 		this.camera.resize(deviceWidth, deviceHeight);
 		this.gl.viewport(0, 0, deviceWidth, deviceHeight);
+		this.update();
+		this.draw();
 	}
 }

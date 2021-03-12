@@ -88,8 +88,7 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		if (!this._heightTexture) {
 			this._heightTexture = gl.createTexture();
 		}
-		const width = this._chart.dataWidth;
-		const height = this._chart.dataHeight;
+		const { region: [sx, sy, width, height] } = this._chart;
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this._heightTexture);
 

@@ -9,26 +9,52 @@ html {
 body {
 	height: 100%;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	padding: 0;
 	margin: 0;
-	align-items: center;
-	justify-content: center;
+	align-items: stretch;
+	justify-content: stretch;
+	font-family: sans-serif;
 }
 #example-graph {
 	position: relative;
-	width: 95%;
-	height: 95%;
+	overflow: hidden;
+	flex: 1;
+	margin: 30px 0;
 	background: #eee;
 	border-radius: 8px;
 	box-shadow: 0 4px 10px 1px rgba(0, 0, 0, 0.3);
 }
+form {
+	margin-top: 30px;
+	width: 200px;
+}
 .test-label {
-	font-family: sans-serif;
 	background: rgba(50, 100, 255, 0.5);
 	padding: 4px 8px;
 	border-radius: 8px;
 	text-align: center;
 	width: 120px;
 	margin-left: -110px;
+}
+.form-field {
+	padding: 8px;
+	display: inline-block;
+	white-space: nowrap;
+	border-bottom: 1px solid #ddd;
+}
+.form-field > label {
+	display: block;
+	text-align: center;
+}
+.form-field .range-value {
+	display: inline-block;
+	width: 30px;
+	text-align: right;
+}
+.form-field input {
+	width: 100px;
+}
+.form-field input + .range-value {
+	text-align: left;
 }
