@@ -23,6 +23,20 @@ export class Camera {
 			.multiply(Matrix4.translation(0.0, 0.0, this.distance));
 	}
 
+	clone(): Camera {
+		const camera = new Camera();
+		camera.width = this.width;
+		camera.height = this.height;
+		camera.near = this.near;
+		camera.far = this.far;
+		camera.distance = this.distance;
+		camera.projection = this.projection.clone();
+		camera.target = [...this.target];
+		camera.rotation = { lon: this.rotation.lon, lat: this.rotation.lat };
+
+		return camera;
+	}
+
 	resize(width: number, height: number): void {
 		this.width = width;
 		this.height = height;
@@ -45,5 +59,20 @@ export class Camera {
 		if (this.rotation.lat > Math.PI / 2) {
 			this.rotation.lat = Math.PI / 2;
 		}
+	}
+
+	cssTransform(trans: Matrix4 = Matrix4.identity()): Matrix4 {
+		const hw = this.width / 2;
+		const hh = this.height / 2;
+		const ratio = hw/hh;
+		const view = this.view.inverse();
+		const proj = this.projection;
+		const viewProj = proj.multiply(view);
+		trans = trans.multiply(Matrix4.scaling(1/hw, 1/-hh, 1));
+		trans = trans.multiply(Matrix4.scaling(ratio, 1, 1));
+		trans = viewProj.multiply(trans);
+		trans = Matrix4.scaling(hw, -hh, 1).multiply(trans);
+
+		return trans;
 	}
 }
