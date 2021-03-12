@@ -9,6 +9,7 @@
 		"module": "esnext",
 		"moduleResolution": "node",
 		"target": "es6",
+		"lib": ["es2019", "dom"],
 		"allowSyntheticDefaultImports": true,
 		"baseUrl": "./",
 		"paths": {

@@ -38,17 +38,10 @@ function main() {
 	});
 	chart.attach('#example-graph');
 
-	const div = document.createElement('div');
-	div.innerHTML = 'Test <b>HTML</b>'
-	Object.assign(div.style, {
-		position: 'absolute',
-	});
-	document.querySelector('#example-graph').appendChild(div);
-
 	const camera: Camera = chart.camera;
 	camera.distance = 2;
 	camera.rotate(0, -Math.PI * 0.2);
-	camera.rotate(Math.PI * 0.3, 0);
+	camera.rotate(Math.PI * 0.1, 0);
 	let dt = 0;
 	let start = performance.now();
 	let end = performance.now();
@@ -59,10 +52,6 @@ function main() {
 		window.requestAnimationFrame(animate);
 		dt = (end - start) / 1000;
 		start = end;
-
-		const pixel = chart.pointToPixel([-0.5, 0.5, 0.5]);
-		div.style.left = `${pixel[0] - div.clientWidth}px`;
-		div.style.top = `${pixel[1]}px`;
 	}
 	animate();
 }

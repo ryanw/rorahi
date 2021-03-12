@@ -23,3 +23,12 @@ body {
 	border-radius: 8px;
 	box-shadow: 0 4px 10px 1px rgba(0, 0, 0, 0.3);
 }
+.test-label {
+	font-family: sans-serif;
+	background: rgba(50, 100, 255, 0.5);
+	padding: 4px 8px;
+	border-radius: 8px;
+	text-align: center;
+	width: 120px;
+	margin-left: -110px;
+}

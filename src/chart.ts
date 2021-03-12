@@ -2,6 +2,7 @@ import { Matrix4, Point2, Point3 } from './geom';
 import { Camera } from './camera';
 import { Heightmap } from './elements/heightmap';
 import { Walls } from './elements/walls';
+import { Html } from './elements/html';
 import { Label, LabelAlign } from './elements/label';
 import { AxisMarkers } from './elements/axis_markers';
 import { RGB } from './color';
@@ -26,8 +27,8 @@ export interface ChartOptions<T extends ArrayLike<number>> {
 }
 
 export interface ChartElement {
-	update(gl: WebGLRenderingContext): void;
-	draw(gl: WebGLRenderingContext, camera: Camera): void;
+	update?(gl: WebGLRenderingContext): void;
+	draw?(gl: WebGLRenderingContext, camera: Camera): void;
 }
 
 const DEFAULT_COLORS: RGB[] = [
@@ -139,6 +140,11 @@ export class Chart<T extends ArrayLike<number>> {
 		// Y axis (up)
 		//this._items.push(new AxisMarkers(this, this.gradient.length, Matrix4.rotation(0, 0, -Math.PI / 2)));
 		this._items.push(new AxisMarkers(this, this.gradient.length, Matrix4.rotation(0, 0, -Math.PI / 2)));
+
+		const el = document.createElement('div');
+		el.className = 'test-label';
+		el.innerHTML = 'Test Label 😝 <button type="button">Clicky</button>';
+		this._items.push(new Html(this, el, Matrix4.translation(-0.5, 0.5, 0.5)));
 	}
 
 	get gl(): WebGLRenderingContext | null {
@@ -149,13 +155,17 @@ export class Chart<T extends ArrayLike<number>> {
 		return this._gl;
 	}
 
+	get container(): HTMLElement | null {
+		return this._container;
+	}
+
 	get data(): T {
 		return this._data;
 	}
 
 	set data(newData: T) {
 		this._data = newData;
-		this.update();
+		this.update?.();
 	}
 
 	get dataWidth(): number {
@@ -167,8 +177,8 @@ export class Chart<T extends ArrayLike<number>> {
 	}
 
 	pointToPixel(p: Point3): Point2 {
-		const view = this.camera.view.inverse();
 		const proj = this.camera.projection;
+		const view = this.camera.view.inverse();
 		const viewProj = proj.multiply(view);
 		const pixel = viewProj.transformPoint3(p);
 		const { clientWidth: width, clientHeight: height } = this._container;
@@ -262,7 +272,7 @@ export class Chart<T extends ArrayLike<number>> {
 
 	update() {
 		for (const item of this._items) {
-			item.update(this.gl);
+			item.update?.(this.gl);
 		}
 	}
 
@@ -283,7 +293,6 @@ export class Chart<T extends ArrayLike<number>> {
 		this._container = element;
 		this.updateSize();
 		element.appendChild(this._canvas);
-		element.style.overflow = 'hidden';
 		this.attachListeners();
 		this.update();
 		this.draw();

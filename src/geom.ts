@@ -136,6 +136,12 @@ export class Matrix4 {
 		return Array.from(this._data);
 	}
 
+
+	setAt(col: number, row: number, value: number) {
+		const idx = row * 4 + col;
+		this._data[idx] = value;
+	}
+
 	at(col: number, row: number): number {
 		const idx = row * 4 + col;
 		return this._data[idx];
