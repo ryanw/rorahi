@@ -8,6 +8,8 @@ import { AxisMarkers } from './elements/axis_markers';
 import { RGB } from './color';
 import { Gradient } from './gradient';
 
+type ExtWheelEvent = WheelEvent & { wheelDelta: number, axis: number, HORIZONTAL_AXIS: 0x01, VERTICAL_AXIS: 0x02 };
+
 export interface AxisOptions {
 	label?: string;
 	range?: [number, number];
@@ -243,10 +245,14 @@ export class Chart<T extends ArrayLike<number>> {
 	private attachMouseListeners() {
 		if (!this._canvas) return;
 		this._canvas.addEventListener('mousedown', this.onMouseDown);
+		this._canvas.addEventListener('wheel', this.onWheel);
+		this._canvas.addEventListener('DOMMouseScroll', this.onWheel);
 	}
 
 	private detachMouseListeners() {
 		this._canvas.removeEventListener('mousedown', this.onMouseDown);
+		this._canvas.removeEventListener('wheel', this.onWheel);
+		this._canvas.removeEventListener('DOMMouseScroll', this.onWheel);
 		window.removeEventListener('mousemove', this.onMouseMove);
 		window.removeEventListener('mouseup', this.onMouseUp);
 	}
@@ -269,6 +275,39 @@ export class Chart<T extends ArrayLike<number>> {
 
 		this.camera.rotate(x, y);
 	}
+
+	private onWheel = (e: ExtWheelEvent) => {
+		// Ignore Firefox 'onwheel'
+		if (!e.axis && !e.wheelDelta) return;
+		e.preventDefault();
+
+		let dx = 0;
+		let dy = 0;
+
+		if (!e.wheelDelta && e.detail) {
+			// Firefox (DOMMouseScroll)
+			const amount = e.detail * 53 / 3;
+			if (e.axis === e.HORIZONTAL_AXIS) {
+				dx = amount;
+			}
+			else {
+				dy = amount;
+			}
+		}
+		else {
+			// Proper wheel event
+			dx = e.deltaX;
+			dy = e.deltaY;
+		}
+
+		this.camera.distance *= 1.0 + dy * 0.003;
+		if (this.camera.distance < 1) {
+			this.camera.distance = 1;
+		}
+		else if (this.camera.distance > 8) {
+			this.camera.distance = 8;
+		}
+	};
 
 	update() {
 		for (const item of this._items) {
