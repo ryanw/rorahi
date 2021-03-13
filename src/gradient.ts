@@ -2,9 +2,11 @@ import { RGB } from './color';
 
 export class Gradient {
 	private _colors: RGB[];
+	smooth = true;
 
-	constructor(colors: RGB[]) {
+	constructor(colors: RGB[], smooth: boolean = false) {
 		this.colors = colors;
+		this.smooth = smooth;
 	}
 
 	get length() {

@@ -197,6 +197,8 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		prog.setUniform('u_gridSize', gridSize);
 		prog.setUniform('u_gridOffset', gridOffset);
 
+		prog.setUniform('u_smoothGradient', this._chart.gradient.smooth);
+
 
 
 		const vertexCount = this._resolution * this._resolution * 6;

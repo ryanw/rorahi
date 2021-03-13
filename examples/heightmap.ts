@@ -1,4 +1,4 @@
-import { Chart, Camera } from 'rorahi';
+import { Chart, Camera, Gradient } from 'rorahi';
 import SimplexNoise from './simplex-noise';
 
 const SIZE = 200;
@@ -8,13 +8,14 @@ function main() {
 	const xOffset = parseFloat((document.querySelector('#x-offset') as HTMLInputElement).value);
 	const yOffset = parseFloat((document.querySelector('#y-offset') as HTMLInputElement).value);
 	const resolution = parseFloat((document.querySelector('#resolution') as HTMLInputElement).value);
+	const smooth = (document.querySelector('#smooth') as HTMLInputElement).checked;
 
 	const data = generateData(0, 0, SIZE, SIZE, 1.0);
 	console.debug("DATA", data);
 	const chart = new Chart({
 		data,
 		dataWidth: SIZE,
-		dataRange: [-0.01, 1.1],
+		dataRange: [0.0, 1.0],
 		resolution,
 		region: [xOffset, yOffset, width, height],
 		axes: {
@@ -31,7 +32,7 @@ function main() {
 				range: [-100, 100],
 			},
 		},
-		gradient: [
+		gradient: new Gradient([
 			[1.0, 0.0, 0.0],
 			[1.0, 0.5, 0.0],
 			[1.0, 1.0, 0.0],
@@ -41,7 +42,7 @@ function main() {
 			[0.0, 0.0, 1.0],
 			[0.5, 0.0, 1.0],
 			[1.0, 0.0, 1.0],
-		],
+		], smooth),
 	});
 	chart.attach('#example-graph');
 
@@ -86,6 +87,13 @@ function main() {
 		const el = e.target as HTMLInputElement;
 		const value = parseFloat(el.value);
 		chart.resolution = value;
+	});
+
+	document.querySelector('#smooth').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = el.checked;
+		chart.gradient.smooth = value;
+		chart.draw();
 	});
 }
 

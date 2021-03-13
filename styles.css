@@ -39,13 +39,18 @@ form {
 }
 .form-field {
 	padding: 8px;
-	display: inline-block;
 	white-space: nowrap;
 	border-bottom: 1px solid #ddd;
 }
 .form-field > label {
 	display: block;
 	text-align: center;
+}
+.form-field > label.checkbox {
+	text-align: left;
+}
+.form-field > label > input[type="checkbox"] {
+	width: auto;
 }
 .form-field .range-value {
 	display: inline-block;
@@ -54,6 +59,7 @@ form {
 }
 .form-field input {
 	width: 100px;
+	vertical-align: middle;
 }
 .form-field input + .range-value {
 	text-align: left;

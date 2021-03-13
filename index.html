@@ -10,18 +10,6 @@
 	<body>
 		<form>
 			<div class="form-field">
-				<label>X Offset</label>
-				<span class="range-value">0</span>
-				<input type="range" id="x-offset" value="50" min="0" max="100">
-				<span class="range-value">100</span>
-			</div>
-			<div class="form-field">
-				<label>Y Offset</label>
-				<span class="range-value">0</span>
-				<input type="range" id="y-offset" value="50" min="0" max="100">
-				<span class="range-value">100</span>
-			</div>
-			<div class="form-field">
 				<label>X Scale</label>
 				<span class="range-value">10</span>
 				<input type="range" id="x-scale" value="50" min="10" max="100">
@@ -31,6 +19,18 @@
 				<label>Y Scale</label>
 				<span class="range-value">10</span>
 				<input type="range" id="y-scale" value="50" min="10" max="100">
+				<span class="range-value">100</span>
+			</div>
+			<div class="form-field">
+				<label>X Offset</label>
+				<span class="range-value">0</span>
+				<input type="range" id="x-offset" value="50" min="0" max="100">
+				<span class="range-value">100</span>
+			</div>
+			<div class="form-field">
+				<label>Y Offset</label>
+				<span class="range-value">0</span>
+				<input type="range" id="y-offset" value="50" min="0" max="100">
 				<span class="range-value">100</span>
 			</div>
 			<div class="form-field">
@@ -44,6 +44,9 @@
 				<span class="range-value">16</span>
 				<input type="range" id="resolution" value="64" min="16" max="128">
 				<span class="range-value">128</span>
+			</div>
+			<div class="form-field">
+				<label class="checkbox"><input type="checkbox" id="smooth"> Smooth Gradient</label>
 			</div>
 		</form>
 		<div id="example-graph"></div>

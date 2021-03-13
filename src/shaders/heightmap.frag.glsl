@@ -8,6 +8,7 @@ uniform vec3 u_intervals[64];
 uniform bool u_flat;
 uniform vec2 u_gridSize;
 uniform vec2 u_gridOffset;
+uniform bool u_smoothGradient;
 
 varying vec2 v_uv;
 varying float v_height;
@@ -25,7 +26,7 @@ float gridPixel(vec2 uv) {
 	return 1.0 - min(line, 1.0);
 }
 
-float heightPixel(float uv) {
+float contourPixel(float uv) {
 	uv *= float(u_intervalCount);
 	float line = abs(fract(uv - 0.5) - 0.5) / fwidth(uv);
 
@@ -33,12 +34,42 @@ float heightPixel(float uv) {
 }
 
 void main(void) {
+	vec3 color = vec3(1.0, 0.0, 1.0);
+
 	// Vertical color gradient
-	int interval = int(v_height / (1.0 / float(u_intervalCount)));
-	vec3 color = vec3(1.0, 0.0, 0.0);
-	for (int i = 0; i < 64; i++) {
-		if (i == interval) {
-			color = u_intervals[i];
+	if (u_smoothGradient) {
+		float idx = v_height / (1.0 / float(u_intervalCount)) - 0.5;
+		int b = int(ceil(idx));
+		int t = int(floor(idx));
+		// Exact colour
+		if (b == t) {
+			int interval = int(idx);
+			for (int i = 0; i < 64; i++) {
+				if (i == interval) {
+					color = u_intervals[i];
+				}
+			}
+		}
+		else {
+			vec3 topColor = vec3(0.0);
+			vec3 bottomColor = vec3(0.0);
+			for (int i = 0; i < 64; i++) {
+				if (i == t) {
+					topColor = u_intervals[i];
+				}
+				if (i == b) {
+					bottomColor = u_intervals[i];
+				}
+			}
+
+			color = mix(topColor, bottomColor, fract(idx));
+		}
+	} else {
+		int interval = int(v_height / (1.0 / float(u_intervalCount)));
+		for (int i = 0; i < 64; i++) {
+			if (i == interval) {
+				color = u_intervals[i];
+			}
 		}
 	}
 
@@ -62,7 +93,7 @@ void main(void) {
 	}
 
 	// Grid lines
-	color = mix(color, lineColor, heightPixel(v_height) * heightLineOpacity);
+	color = mix(color, lineColor, contourPixel(v_height) * heightLineOpacity);
 	color = mix(color, lineColor, gridPixel(v_uv) * gridLineOpacity);
 
 	// Color magic
