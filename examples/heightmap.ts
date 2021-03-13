@@ -14,6 +14,7 @@ function main() {
 		data,
 		dataWidth: SIZE,
 		resolution: 128,
+		dataRange: [-0.01, 1.1],
 		region: [xOffset, yOffset, width, height],
 		axes: {
 			x: {

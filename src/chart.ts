@@ -18,6 +18,7 @@ export interface AxisOptions {
 export interface ChartOptions<T extends ArrayLike<number>> {
 	data?: T;
 	dataWidth?: number;
+	dataRange?: [number, number];
 	resolution?: number;
 	gradient?: Gradient | RGB[];
 	region?: Rect;
@@ -52,6 +53,7 @@ export class Chart<T extends ArrayLike<number>> {
 	private _resizeObserver: ResizeObserver;
 	private _mouseEnabled = true;
 	private _region: Rect = [0, 0, 0, 0];
+	private _dataRange = [0.0, 1.0];
 	readonly gradient: Gradient;
 	camera = new Camera();
 
@@ -62,6 +64,10 @@ export class Chart<T extends ArrayLike<number>> {
 		}
 		if (options?.dataWidth) {
 			this._dataWidth = options.dataWidth;
+		}
+
+		if (options?.dataRange) {
+			this._dataRange = [...options.dataRange];
 		}
 
 		if (options?.region) {
@@ -149,7 +155,6 @@ export class Chart<T extends ArrayLike<number>> {
 		this._items.push(new AxisMarkers(this, 16, Matrix4.rotation(0, -Math.PI / 2, 0)));
 
 		// Y axis (up)
-		//this._items.push(new AxisMarkers(this, this.gradient.length, Matrix4.rotation(0, 0, -Math.PI / 2)));
 		this._items.push(new AxisMarkers(this, this.gradient.length, Matrix4.rotation(0, 0, -Math.PI / 2)));
 
 		const el = document.createElement('div');
@@ -222,6 +227,22 @@ export class Chart<T extends ArrayLike<number>> {
 		return this._data.length / this._dataWidth;
 	}
 
+	calculateDataRange() {
+		let min = Number.MAX_VALUE;
+		let max = Number.MIN_VALUE;
+		for (let i = 0; i < this._data.length; i++) {
+			const v = this._data[i];
+			if (v < min) {
+				min = v;
+			}
+			if (v > max) {
+				max = v;
+			}
+		}
+
+		this._dataRange = [min, max];
+	}
+
 	pointToPixel(p: Point3): Point2 {
 		const proj = this.camera.projection;
 		const view = this.camera.view.inverse();
@@ -255,6 +276,16 @@ export class Chart<T extends ArrayLike<number>> {
 		if (y > this.dataHeight) return null;
 		const i = x + y * this._dataWidth;
 		return this.data[i];
+	}
+
+	getNormalizedData(x: number, y: number): number {
+		return this.normalizeData(this.getData(x, y));
+	}
+
+	private normalizeData(value: number): number {
+		const [srcMin, srcMax] = this._dataRange;
+		const [dstMin, dstMax] = [0.0, 1.0];
+		return (value - srcMin) * (dstMax - dstMin) / (srcMax - srcMin) + dstMin;
 	}
 
 	private initWebGL() {

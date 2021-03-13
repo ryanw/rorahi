@@ -99,7 +99,7 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 			for (let y = 0; y < height; y++) {
 				for (let x = 0; x < width; x++) {
 					const i = (x + y * width) * 4;
-					pixels[i + 0] = this._chart.getData(x, y);
+					pixels[i + 0] = this._chart.getNormalizedData(x, y);
 					pixels[i + 1] = 0;
 					pixels[i + 2] = 0;
 					pixels[i + 3] = 0;
@@ -111,7 +111,7 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 			for (let y = 0; y < height; y++) {
 				for (let x = 0; x < width; x++) {
 					const i = (x + y * width) * 4;
-					pixels[i + 0] = this._chart.getData(x, y) * 255;
+					pixels[i + 0] = this._chart.getNormalizedData(x, y) * 255;
 					pixels[i + 1] = 0;
 					pixels[i + 2] = 0;
 					pixels[i + 3] = 0;
