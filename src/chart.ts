@@ -54,6 +54,8 @@ export class Chart<T extends ArrayLike<number>> {
 	private _mouseEnabled = true;
 	private _region: Rect = [0, 0, 0, 0];
 	private _dataRange = [0.0, 1.0];
+	private _resolution = 64;
+	private _heightmap: Heightmap<T>;
 	readonly gradient: Gradient;
 	camera = new Camera();
 
@@ -88,12 +90,15 @@ export class Chart<T extends ArrayLike<number>> {
 			this.gradient = new Gradient(DEFAULT_COLORS);
 		}
 
-		const res = options?.resolution || 64;
+		if (options?.resolution) {
+			this._resolution = options.resolution;
+		}
 
 		// Heightmap visualisation
-		const heightmap = new Heightmap(this, res, res);
+		const heightmap = new Heightmap(this, this._resolution);
 		heightmap.transform = Matrix4.rotation(-Math.PI / 2, 0, 0);
 		this._items.push(heightmap);
+		this._heightmap = heightmap;
 
 		// Walls
 		this._items.push(new Walls(this));
@@ -181,6 +186,16 @@ export class Chart<T extends ArrayLike<number>> {
 
 	get region(): Rect {
 		return [...this._region];
+	}
+
+	get resolution(): number {
+		return this._resolution;
+	}
+
+	set resolution(resolution: number) {
+		this._resolution = resolution;
+		this._heightmap.resolution = resolution;
+		this.draw();
 	}
 
 	set region(rect: Rect) {

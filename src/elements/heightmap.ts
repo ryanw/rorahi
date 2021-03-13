@@ -8,8 +8,7 @@ import HeightmapFragmentShader from '../shaders/heightmap.frag.glsl';
 export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 	private _vertexBuffer: WebGLBuffer;
 	private _indexBuffer: WebGLBuffer;
-	private _width: number;
-	private _height: number;
+	private _resolution: number;
 	private _program: Program;
 	private _heightTexture: WebGLTexture;
 	private _chart: Chart<T>;
@@ -17,13 +16,21 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 	private _useLinearFilter: boolean = true;
 	transform: Matrix4 = Matrix4.identity();
 
-	constructor(chart: Chart<T>, width: number, height: number) {
-		if (width < 1 || height < 1) {
-			throw `Heightmap must have a positive size`;
+	constructor(chart: Chart<T>, resolution: number) {
+		if (resolution < 1) {
+			throw `Heightmap must have resolution > 0`;
 		}
 		this._chart = chart;
-		this._width = width;
-		this._height = height;
+		this._resolution = resolution;
+	}
+
+	get resolution(): number {
+		return this._resolution;
+	}
+
+	set resolution(resolution: number) {
+		this._resolution = resolution;
+		this.buildMesh();
 	}
 
 	private compileShaders(gl: WebGLRenderingContext) {
@@ -42,16 +49,28 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 
 		this.updateHeightTexture(gl);
 		if (this._vertexBuffer) return;
-		this._vertexBuffer = gl.createBuffer();
-		this._indexBuffer = gl.createBuffer();
+		this.buildMesh();
+	}
+
+	private buildMesh() {
+		console.log("BUILDING MESH!");
+		const gl = this._chart.gl;
+		if (!this._vertexBuffer) {
+			this._vertexBuffer = gl.createBuffer();
+		}
+		if (!this._indexBuffer) {
+			this._indexBuffer = gl.createBuffer();
+		}
 
 		// Extra row/col of vertices for the edge triangles
-		const w = this._width + 1;
-		const h = this._height + 1;
+		const width = this._resolution;
+		const height = this._resolution;
+		const w = width + 1;
+		const h = height + 1;
 
 		// Build our plane
 		const vertexSize = 3; // x, y, z
-		const triangles = new Uint16Array(this._width * this._height * 6);
+		const triangles = new Uint16Array(width * height * 6);
 		const vertices = new Float32Array(w * h * vertexSize);
 		const z = 0.0;
 		let tri = 0;
@@ -59,12 +78,12 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 			for (let x = 0; x < w; x++) {
 				const idx = x + y * w;
 				const i = idx * vertexSize;
-				vertices[i + 0] = x / this._width - 0.5;
-				vertices[i + 1] = y / this._height - 0.5;
+				vertices[i + 0] = x / width - 0.5;
+				vertices[i + 1] = y / height - 0.5;
 				vertices[i + 2] = z;
 
 				// Add 2 triangles for each quad
-				if (x < this._width && y < this._height) {
+				if (x < width && y < height) {
 					triangles[tri++] = idx;
 					triangles[tri++] = idx + w + 1;
 					triangles[tri++] = idx + w;
@@ -180,7 +199,7 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 
 
 
-		const vertexCount = this._width * this._height * 6;
+		const vertexCount = this._resolution * this._resolution * 6;
 
 		gl.disable(gl.CULL_FACE);
 

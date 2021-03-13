@@ -7,14 +7,15 @@ function main() {
 	const height = parseFloat((document.querySelector('#y-scale') as HTMLInputElement).value);
 	const xOffset = parseFloat((document.querySelector('#x-offset') as HTMLInputElement).value);
 	const yOffset = parseFloat((document.querySelector('#y-offset') as HTMLInputElement).value);
+	const resolution = parseFloat((document.querySelector('#resolution') as HTMLInputElement).value);
 
 	const data = generateData(0, 0, SIZE, SIZE, 1.0);
 	console.debug("DATA", data);
 	const chart = new Chart({
 		data,
 		dataWidth: SIZE,
-		resolution: 128,
 		dataRange: [-0.01, 1.1],
+		resolution,
 		region: [xOffset, yOffset, width, height],
 		axes: {
 			x: {
@@ -79,6 +80,12 @@ function main() {
 		const el = e.target as HTMLInputElement;
 		const value = parseFloat(el.value);
 		chart.yOffset = value;
+	});
+
+	document.querySelector('#resolution').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = parseFloat(el.value);
+		chart.resolution = value;
 	});
 }
 
