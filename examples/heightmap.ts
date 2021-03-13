@@ -13,7 +13,6 @@ function main() {
 	const chart = new Chart({
 		data,
 		dataWidth: SIZE,
-		origin: [0, 0, 0],
 		resolution: 128,
 		region: [xOffset, yOffset, width, height],
 		axes: {
@@ -60,13 +59,13 @@ function main() {
 	document.querySelector('#x-scale').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = parseFloat(el.value);
-		chart.xWidth = value;
+		chart.xScale = value;
 	});
 
 	document.querySelector('#y-scale').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = parseFloat(el.value);
-		chart.yWidth = value;
+		chart.yScale = value;
 	});
 
 	document.querySelector('#x-offset').addEventListener('input', (e: InputEvent) => {

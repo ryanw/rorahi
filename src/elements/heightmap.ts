@@ -162,6 +162,24 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		gl.activeTexture(gl.TEXTURE0 + textureUnit);
 		gl.bindTexture(gl.TEXTURE_2D, this._heightTexture);
 
+
+
+		// Grid size
+		const region = this._chart.region;
+		const gridScale = 5.0;
+		const gridSize = [
+			(1.0 / region[2]) * gridScale,
+			(1.0 / region[3]) * gridScale,
+		];
+		const gridOffset = [
+			region[0] / gridScale,
+			region[1] / gridScale,
+		]
+		prog.setUniform('u_gridSize', gridSize);
+		prog.setUniform('u_gridOffset', gridOffset);
+
+
+
 		const vertexCount = this._width * this._height * 6;
 
 		gl.disable(gl.CULL_FACE);

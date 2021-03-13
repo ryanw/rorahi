@@ -18,7 +18,6 @@ export interface AxisOptions {
 export interface ChartOptions<T extends ArrayLike<number>> {
 	data?: T;
 	dataWidth?: number;
-	origin?: [number, number, number];
 	resolution?: number;
 	gradient?: Gradient | RGB[];
 	region?: Rect;
@@ -203,13 +202,13 @@ export class Chart<T extends ArrayLike<number>> {
 		this.draw();
 	}
 
-	set xWidth(value: number) {
+	set xScale(value: number) {
 		this._region[2] = value;
 		this.update();
 		this.draw();
 	}
 
-	set yWidth(value: number) {
+	set yScale(value: number) {
 		this._region[3] = value;
 		this.update();
 		this.draw();
