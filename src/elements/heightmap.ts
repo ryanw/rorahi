@@ -198,6 +198,8 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		prog.setUniform('u_gridOffset', gridOffset);
 
 		prog.setUniform('u_smoothGradient', this._chart.gradient.smooth);
+		prog.setUniform('u_contourLines', this._chart.showContours);
+		prog.setUniform('u_gridLines', this._chart.showGrid);
 
 
 

@@ -9,13 +9,15 @@ uniform bool u_flat;
 uniform vec2 u_gridSize;
 uniform vec2 u_gridOffset;
 uniform bool u_smoothGradient;
+uniform bool u_contourLines;
+uniform bool u_gridLines;
 
 varying vec2 v_uv;
 varying float v_height;
 
 vec3 lineColor = vec3(0.0);
-float heightLineOpacity = 0.66;
-float gridLineOpacity = 0.33;
+float contourLineOpacity = 0.8;
+float gridLineOpacity = 0.5;
 
 float gridPixel(vec2 uv) {
 	uv /= u_gridSize;
@@ -93,8 +95,12 @@ void main(void) {
 	}
 
 	// Grid lines
-	color = mix(color, lineColor, contourPixel(v_height) * heightLineOpacity);
-	color = mix(color, lineColor, gridPixel(v_uv) * gridLineOpacity);
+	if (u_contourLines) {
+		color = mix(color, lineColor, contourPixel(v_height) * contourLineOpacity);
+	}
+	if (u_gridLines) {
+		color = mix(color, lineColor, gridPixel(v_uv) * gridLineOpacity);
+	}
 
 	// Color magic
 	color = sqrt(color);

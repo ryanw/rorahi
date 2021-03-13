@@ -9,6 +9,8 @@ function main() {
 	const yOffset = parseFloat((document.querySelector('#y-offset') as HTMLInputElement).value);
 	const resolution = parseFloat((document.querySelector('#resolution') as HTMLInputElement).value);
 	const smooth = (document.querySelector('#smooth') as HTMLInputElement).checked;
+	const showContours = (document.querySelector('#contours') as HTMLInputElement).checked;
+	const showGrid = (document.querySelector('#grid') as HTMLInputElement).checked;
 
 	const data = generateData(0, 0, SIZE, SIZE, 1.0);
 	console.debug("DATA", data);
@@ -18,6 +20,8 @@ function main() {
 		dataRange: [0.0, 1.0],
 		resolution,
 		region: [xOffset, yOffset, width, height],
+		showContours,
+		showGrid,
 		axes: {
 			x: {
 				label: 'Foo',
@@ -94,6 +98,18 @@ function main() {
 		const value = el.checked;
 		chart.gradient.smooth = value;
 		chart.draw();
+	});
+
+	document.querySelector('#contours').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = el.checked;
+		chart.showContours = value;
+	});
+
+	document.querySelector('#grid').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = el.checked;
+		chart.showGrid = value;
 	});
 }
 

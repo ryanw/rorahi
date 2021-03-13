@@ -22,6 +22,8 @@ export interface ChartOptions<T extends ArrayLike<number>> {
 	resolution?: number;
 	gradient?: Gradient | RGB[];
 	region?: Rect;
+	showContours?: boolean;
+	showGrid?: boolean;
 	axes?: {
 		x?: AxisOptions;
 		y?: AxisOptions;
@@ -56,6 +58,8 @@ export class Chart<T extends ArrayLike<number>> {
 	private _dataRange = [0.0, 1.0];
 	private _resolution = 64;
 	private _heightmap: Heightmap<T>;
+	private _showContours = false;
+	private _showGrid = false;
 	readonly gradient: Gradient;
 	camera = new Camera();
 
@@ -92,6 +96,14 @@ export class Chart<T extends ArrayLike<number>> {
 
 		if (options?.resolution) {
 			this._resolution = options.resolution;
+		}
+
+		if (options?.showContours) {
+			this._showContours = options.showContours;
+		}
+
+		if (options?.showGrid) {
+			this._showGrid = options.showGrid;
 		}
 
 		// Heightmap visualisation
@@ -161,11 +173,6 @@ export class Chart<T extends ArrayLike<number>> {
 
 		// Y axis (up)
 		this._items.push(new AxisMarkers(this, this.gradient.length, Matrix4.rotation(0, 0, -Math.PI / 2)));
-
-		const el = document.createElement('div');
-		el.className = 'test-label';
-		el.innerHTML = 'Test Label 😝 <button type="button">Clicky</button>';
-		this._items.push(new Html(this, el, Matrix4.translation(-0.5, 0.5, 0.5)));
 	}
 
 	get gl(): WebGLRenderingContext | null {
@@ -195,6 +202,24 @@ export class Chart<T extends ArrayLike<number>> {
 	set resolution(resolution: number) {
 		this._resolution = resolution;
 		this._heightmap.resolution = resolution;
+		this.draw();
+	}
+
+	get showContours(): boolean {
+		return this._showContours;
+	}
+
+	set showContours(showContours: boolean) {
+		this._showContours = showContours;
+		this.draw();
+	}
+
+	get showGrid(): boolean {
+		return this._showGrid;
+	}
+
+	set showGrid(showGrid: boolean) {
+		this._showGrid = showGrid;
 		this.draw();
 	}
 
