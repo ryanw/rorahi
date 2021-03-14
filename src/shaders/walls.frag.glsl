@@ -9,24 +9,23 @@ varying vec2 v_uv;
 vec3 faceColor = vec3(1.0);
 vec3 lineColor = vec3(0.6);
 
-float edgeDistance(vec3 barycentric) {
-	vec3 d = fwidth(barycentric);
-	vec3 a = smoothstep(vec3(0.0), d * 2.0, barycentric);
-	return min(min(a.x, a.y), a.z);
+float contourPixel(float uv) {
+	uv *= float(u_intervalCount);
+	float line = abs(fract(uv - 0.5) - 0.5) / fwidth(uv);
+
+	return 1.0 - min(line, 1.0);
+}
+
+float edgePixel(vec3 uv) {
+	vec3 grid = abs(fract(uv - 0.5) - 0.5) / fwidth(uv);
+	float line = min(min(grid.x, grid.y), grid.z);
+
+	return 1.0 - min(line, 1.0);
 }
 
 void main(void) {
-	float div = float(u_intervalCount);
-	float lineWidth = 0.02;
-	float d = edgeDistance(v_barycentric);
 	vec3 color = faceColor;
-	if (d < 1.0) {
-		color = mix(lineColor, faceColor, d);
-	}
-
-	float seg = cos(v_uv.y * div * 3.14 * 2.);
-	seg = smoothstep(1.0 - lineWidth, 1.0, seg);
-	color = mix(color, lineColor, seg);
-
+	color = mix(color, lineColor, contourPixel(v_uv.y));
+	color = mix(color, lineColor, edgePixel(v_barycentric));
 	gl_FragColor = vec4(color, 1.0);
 }
