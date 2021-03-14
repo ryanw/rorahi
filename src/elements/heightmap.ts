@@ -193,7 +193,7 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		const gridOffset = [
 			region[0] / gridScale,
 			region[1] / gridScale,
-		]
+		];
 		prog.setUniform('u_gridSize', gridSize);
 		prog.setUniform('u_gridOffset', gridOffset);
 

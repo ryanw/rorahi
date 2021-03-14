@@ -4,7 +4,7 @@ import { Heightmap } from './elements/heightmap';
 import { Walls } from './elements/walls';
 import { Html } from './elements/html';
 import { Label, LabelAlign } from './elements/label';
-import { AxisMarkers } from './elements/axis_markers';
+import { AxisMarkers, Axis } from './elements/axis_markers';
 import { RGB } from './color';
 import { Gradient } from './gradient';
 
@@ -51,7 +51,7 @@ export class Chart<T extends ArrayLike<number>> {
 	private _canvas: HTMLCanvasElement;
 	private _container: HTMLElement;
 	private _gl: WebGLRenderingContext;
-	private _items: ChartElement[] = [];
+	private _elements: ChartElement[] = [];
 	private _resizeObserver: ResizeObserver;
 	private _mouseEnabled = true;
 	private _region: Rect = [0, 0, 0, 0];
@@ -109,12 +109,13 @@ export class Chart<T extends ArrayLike<number>> {
 		// Heightmap visualisation
 		const heightmap = new Heightmap(this, this._resolution);
 		heightmap.transform = Matrix4.rotation(-Math.PI / 2, 0, 0);
-		this._items.push(heightmap);
+		this._elements.push(heightmap);
 		this._heightmap = heightmap;
 
 		// Walls
-		this._items.push(new Walls(this));
+		this._elements.push(new Walls(this));
 
+		/*
 		// X Marker Labels
 		for (let i = 0; i < 17; i++) {
 			const labelTrans = Matrix4.identity()
@@ -128,7 +129,7 @@ export class Chart<T extends ArrayLike<number>> {
 				align: LabelAlign.RIGHT,
 				transform: labelTrans,
 			});
-			this._items.push(label);
+			this._elements.push(label);
 		}
 
 		// Y (up) Marker Labels
@@ -144,7 +145,7 @@ export class Chart<T extends ArrayLike<number>> {
 				align: LabelAlign.RIGHT,
 				transform: labelTrans,
 			});
-			this._items.push(label);
+			this._elements.push(label);
 		}
 
 		// Z (forward) Marker Labels
@@ -160,19 +161,20 @@ export class Chart<T extends ArrayLike<number>> {
 				align: LabelAlign.CENTER,
 				transform: labelTrans,
 			});
-			this._items.push(label);
+			this._elements.push(label);
 		}
+		*/
 
 		// X axis
-		this._items.push(new AxisMarkers(this, 16));
-		this._items.push(new AxisMarkers(this, 16, Matrix4.rotation(0, Math.PI, 0)));
+		this._elements.push(new AxisMarkers(this, Axis.X, Matrix4.translation(0.0, 0.0, 0.02)));
+		this._elements.push(new AxisMarkers(this, Axis.X, Matrix4.translation(0.0, 0.0, -1.02)));
 
 		// Z axis (forward)
-		this._items.push(new AxisMarkers(this, 16, Matrix4.rotation(0, Math.PI / 2, 0)));
-		this._items.push(new AxisMarkers(this, 16, Matrix4.rotation(0, -Math.PI / 2, 0)));
+		this._elements.push(new AxisMarkers(this, Axis.Z, Matrix4.rotation(0, Math.PI / 2, 0).multiply(Matrix4.translation(0.0, 0.0, 0.02))));
+		this._elements.push(new AxisMarkers(this, Axis.Z, Matrix4.rotation(0, Math.PI / 2, 0).multiply(Matrix4.translation(0.0, 0.0, -1.02))));
 
 		// Y axis (up)
-		this._items.push(new AxisMarkers(this, this.gradient.length, Matrix4.rotation(0, 0, -Math.PI / 2)));
+		this._elements.push(new AxisMarkers(this, Axis.Y, Matrix4.rotation(0, 0, -Math.PI / 2).multiply(Matrix4.translation(0.0, 0.0, 0.02))));
 	}
 
 	get gl(): WebGLRenderingContext | null {
@@ -265,6 +267,10 @@ export class Chart<T extends ArrayLike<number>> {
 
 	get dataHeight(): number {
 		return this._data.length / this._dataWidth;
+	}
+
+	addElement(el: ChartElement) {
+		this._elements.push(el);
 	}
 
 	calculateDataRange() {
@@ -433,8 +439,8 @@ export class Chart<T extends ArrayLike<number>> {
 	};
 
 	update() {
-		for (const item of this._items) {
-			item.update?.(this.gl);
+		for (const element of this._elements) {
+			element.update?.(this.gl);
 		}
 	}
 
@@ -444,8 +450,8 @@ export class Chart<T extends ArrayLike<number>> {
 		gl.clearDepth(1.0);
 		gl.clearColor(0.0, 0.0, 0.0, 0.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		for (const item of this._items) {
-			item.draw(gl, this.camera);
+		for (const element of this._elements) {
+			element.draw(gl, this.camera);
 		}
 	}
 
