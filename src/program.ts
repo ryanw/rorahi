@@ -54,7 +54,14 @@ export class Program {
 		return this._gl.getAttribLocation(this._webGLProgram, name);
 	}
 
-	bindAttribute(name: string, buffer: WebGLBuffer, size: number, attrType: number = WebGLRenderingContext.FLOAT, stride: number = 0, offset: number = 0) {
+	bindAttribute(
+		name: string,
+		buffer: WebGLBuffer,
+		size: number,
+		attrType: number = WebGLRenderingContext.FLOAT,
+		stride: number = 0,
+		offset: number = 0
+	) {
 		const gl = this._gl;
 		const loc = gl.getAttribLocation(this._webGLProgram, name);
 		gl.enableVertexAttribArray(loc);
@@ -85,8 +92,7 @@ export class Program {
 			// Try to detect type from value type
 			if (value instanceof Matrix4) {
 				uniformType = gl.FLOAT_MAT4;
-			}
-			else if (Array.isArray(value)) {
+			} else if (Array.isArray(value)) {
 				switch (value.length) {
 					case 2:
 						uniformType = gl.FLOAT_VEC2;
@@ -98,11 +104,9 @@ export class Program {
 						uniformType = gl.FLOAT_VEC4;
 						break;
 				}
-			}
-			else if (typeof value === 'number') {
+			} else if (typeof value === 'number') {
 				uniformType = gl.FLOAT;
-			}
-			else if (typeof value === 'boolean') {
+			} else if (typeof value === 'boolean') {
 				uniformType = gl.BOOL;
 			}
 		}

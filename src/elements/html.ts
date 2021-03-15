@@ -45,4 +45,3 @@ export class Html implements ChartElement {
 		this._element.style.top = `${pixel[1] | 0}px`;
 	}
 }
-

@@ -8,7 +8,7 @@ import { AxisMarkers, Axis } from './elements/axis_markers';
 import { RGB } from './color';
 import { Gradient } from './gradient';
 
-type ExtWheelEvent = WheelEvent & { wheelDelta: number, axis: number, HORIZONTAL_AXIS: 0x01, VERTICAL_AXIS: 0x02 };
+type ExtWheelEvent = WheelEvent & { wheelDelta: number; axis: number; HORIZONTAL_AXIS: 0x01; VERTICAL_AXIS: 0x02 };
 
 export interface AxisOptions {
 	label?: string;
@@ -78,8 +78,7 @@ export class Chart<T extends ArrayLike<number>> {
 
 		if (options?.region) {
 			this._region = [...options.region];
-		}
-		else if (options?.data && options?.dataWidth) {
+		} else if (options?.data && options?.dataWidth) {
 			this._region = [0, 0, options.dataWidth, options.data.length / options.dataWidth];
 		}
 
@@ -89,8 +88,7 @@ export class Chart<T extends ArrayLike<number>> {
 			} else {
 				this.gradient = new Gradient(options.gradient);
 			}
-		}
-		else {
+		} else {
 			this.gradient = new Gradient(DEFAULT_COLORS);
 		}
 
@@ -170,11 +168,17 @@ export class Chart<T extends ArrayLike<number>> {
 		this._elements.push(new AxisMarkers(this, Axis.X, Matrix4.translation(0.0, 0.0, -1.02)));
 
 		// Z axis (forward)
-		this._elements.push(new AxisMarkers(this, Axis.Z, Matrix4.rotation(0, Math.PI / 2, 0).multiply(Matrix4.translation(0.0, 0.0, 0.02))));
-		this._elements.push(new AxisMarkers(this, Axis.Z, Matrix4.rotation(0, Math.PI / 2, 0).multiply(Matrix4.translation(0.0, 0.0, -1.02))));
+		this._elements.push(
+			new AxisMarkers(this, Axis.Z, Matrix4.rotation(0, Math.PI / 2, 0).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
+		);
+		this._elements.push(
+			new AxisMarkers(this, Axis.Z, Matrix4.rotation(0, Math.PI / 2, 0).multiply(Matrix4.translation(0.0, 0.0, -1.02)))
+		);
 
 		// Y axis (up)
-		this._elements.push(new AxisMarkers(this, Axis.Y, Matrix4.rotation(0, 0, -Math.PI / 2).multiply(Matrix4.translation(0.0, 0.0, 0.02))));
+		this._elements.push(
+			new AxisMarkers(this, Axis.Y, Matrix4.rotation(0, 0, -Math.PI / 2).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
+		);
 	}
 
 	get gl(): WebGLRenderingContext | null {
@@ -331,7 +335,7 @@ export class Chart<T extends ArrayLike<number>> {
 	private normalizeData(value: number): number {
 		const [srcMin, srcMax] = this._dataRange;
 		const [dstMin, dstMax] = [0.0, 1.0];
-		return (value - srcMin) * (dstMax - dstMin) / (srcMax - srcMin) + dstMin;
+		return ((value - srcMin) * (dstMax - dstMin)) / (srcMax - srcMin) + dstMin;
 	}
 
 	private initWebGL() {
@@ -387,12 +391,12 @@ export class Chart<T extends ArrayLike<number>> {
 	private onMouseDown = () => {
 		window.addEventListener('mousemove', this.onMouseMove);
 		window.addEventListener('mouseup', this.onMouseUp);
-	}
+	};
 
 	private onMouseUp = () => {
 		window.removeEventListener('mousemove', this.onMouseMove);
 		window.removeEventListener('mouseup', this.onMouseUp);
-	}
+	};
 
 	private onMouseMove = (e: MouseEvent) => {
 		const mouseSpeed = 0.005;
@@ -402,7 +406,7 @@ export class Chart<T extends ArrayLike<number>> {
 
 		this.camera.rotate(x, y);
 		this.draw();
-	}
+	};
 
 	private onWheel = (e: ExtWheelEvent) => {
 		// Ignore Firefox 'onwheel'
@@ -414,15 +418,13 @@ export class Chart<T extends ArrayLike<number>> {
 
 		if (!e.wheelDelta && e.detail) {
 			// Firefox (DOMMouseScroll)
-			const amount = e.detail * 53 / 3;
+			const amount = (e.detail * 53) / 3;
 			if (e.axis === e.HORIZONTAL_AXIS) {
 				dx = amount;
-			}
-			else {
+			} else {
 				dy = amount;
 			}
-		}
-		else {
+		} else {
 			// Proper wheel event
 			dx = e.deltaX;
 			dy = e.deltaY;
@@ -431,8 +433,7 @@ export class Chart<T extends ArrayLike<number>> {
 		this.camera.distance *= 1.0 + dy * 0.003;
 		if (this.camera.distance < 1) {
 			this.camera.distance = 1;
-		}
-		else if (this.camera.distance > 8) {
+		} else if (this.camera.distance > 8) {
 			this.camera.distance = 8;
 		}
 		this.draw();

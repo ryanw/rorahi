@@ -53,7 +53,6 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 	}
 
 	private buildMesh() {
-		console.log("BUILDING MESH!");
 		const gl = this._chart.gl;
 		if (!this._vertexBuffer) {
 			this._vertexBuffer = gl.createBuffer();
@@ -107,7 +106,9 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		if (!this._heightTexture) {
 			this._heightTexture = gl.createTexture();
 		}
-		const { region: [sx, sy, width, height] } = this._chart;
+		const {
+			region: [sx, sy, width, height],
+		} = this._chart;
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this._heightTexture);
 
@@ -181,27 +182,17 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		gl.activeTexture(gl.TEXTURE0 + textureUnit);
 		gl.bindTexture(gl.TEXTURE_2D, this._heightTexture);
 
-
-
 		// Grid size
 		const region = this._chart.region;
 		const gridScale = 5.0;
-		const gridSize = [
-			(1.0 / region[2]) * gridScale,
-			(1.0 / region[3]) * gridScale,
-		];
-		const gridOffset = [
-			region[0] / gridScale,
-			region[1] / gridScale,
-		];
+		const gridSize = [(1.0 / region[2]) * gridScale, (1.0 / region[3]) * gridScale];
+		const gridOffset = [region[0] / gridScale, region[1] / gridScale];
 		prog.setUniform('u_gridSize', gridSize);
 		prog.setUniform('u_gridOffset', gridOffset);
 
 		prog.setUniform('u_smoothGradient', this._chart.gradient.smooth);
 		prog.setUniform('u_contourLines', this._chart.showContours);
 		prog.setUniform('u_gridLines', this._chart.showGrid);
-
-
 
 		const vertexCount = this._resolution * this._resolution * 6;
 

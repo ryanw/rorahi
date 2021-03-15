@@ -31,7 +31,7 @@ export class AxisMarkers implements ChartElement {
 
 		for (let i = 0; i < 17; i++) {
 			const labelTrans = Matrix4.identity()
-				.multiply(Matrix4.translation(-0.5 + (i * (1/16)), -0.5, 0.55))
+				.multiply(Matrix4.translation(-0.5 + i * (1 / 16), -0.5, 0.55))
 				.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
 				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
 			const label = new Label({
@@ -59,7 +59,7 @@ export class AxisMarkers implements ChartElement {
 		if (this._positionBuffer) return;
 		this._positionBuffer = gl.createBuffer();
 		const transform = Matrix4.identity()
-			.multiply(Matrix4.translation(0, -1, 0.50))
+			.multiply(Matrix4.translation(0, -1, 0.5))
 			.multiply(Matrix4.scaling(1.0, 1.0, 0.02))
 			.multiply(Matrix4.scaling(0.5));
 		const [positions] = createFace([0, 1, 0], transform);
@@ -74,14 +74,8 @@ export class AxisMarkers implements ChartElement {
 		// Grid size
 		const region = this._chart.region;
 		const gridScale = 5.0;
-		const gridSize = [
-			(1.0 / region[2]) * gridScale,
-			(1.0 / region[3]) * gridScale,
-		];
-		const gridOffset = [
-			region[0] / gridScale,
-			region[1] / gridScale,
-		];
+		const gridSize = [(1.0 / region[2]) * gridScale, (1.0 / region[3]) * gridScale];
+		const gridOffset = [region[0] / gridScale, region[1] / gridScale];
 		switch (this._axis) {
 			case Axis.X:
 				prog.setUniform('u_gridSize', gridSize[0]);

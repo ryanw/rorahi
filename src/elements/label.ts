@@ -94,7 +94,7 @@ export class Label implements ChartElement {
 	}
 
 	private updateTexture(gl: WebGLRenderingContext) {
-		const pad = this._fontSize * 0.2 | 0;
+		const pad = (this._fontSize * 0.2) | 0;
 		const canvas = document.createElement('canvas');
 		const ctx = canvas.getContext('2d');
 		ctx.font = `${this._fontSize}px sans-serif`;
@@ -110,12 +110,10 @@ export class Label implements ChartElement {
 		canvas.height = imgHeight;
 		ctx.font = `${this._fontSize}px sans-serif`;
 		ctx.textBaseline = 'top';
-		ctx.fillStyle = `rgba(${this._color.map(c => c * 255).join(',')})`;
+		ctx.fillStyle = `rgba(${this._color.map((c) => c * 255).join(',')})`;
 		ctx.fillText(this._text, 0, pad);
 		this._textureSize = [imgWidth, imgHeight];
 		this._textSize = [textWidth, textHeight];
-
-
 
 		this._texture = gl.createTexture();
 		const textureUnit = 1;
@@ -124,14 +122,7 @@ export class Label implements ChartElement {
 
 		const [w, h] = this._textureSize;
 		const pixels = ctx.getImageData(0, 0, w, h);
-		gl.texImage2D(
-			gl.TEXTURE_2D,
-			0,
-			gl.RGBA,
-			gl.RGBA,
-			gl.UNSIGNED_BYTE,
-			pixels
-		);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
