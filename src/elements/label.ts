@@ -32,10 +32,12 @@ export interface LabelOptions {
 	fontSize?: number;
 	transform?: Matrix4;
 	color?: RGB | RGBA;
+	orthographic?: boolean;
 }
 
 export class Label implements ChartElement {
 	private _positionBuffer: WebGLBuffer;
+	private _offsetBuffer: WebGLBuffer;
 	private _uvBuffer: WebGLBuffer;
 	private _text: string;
 	private _program: Program;
@@ -46,9 +48,12 @@ export class Label implements ChartElement {
 	private _align = LabelAlign.LEFT;
 	private _quadHeight = 0.2;
 	private _color: RGBA = [0.0, 0.0, 0.0, 1.0];
+	private _orthographic = false;
+	private _chart: Chart<any>;
 	transform = Matrix4.identity();
 
-	constructor(textOrOptions: string | LabelOptions) {
+	constructor(chart: Chart<any>, textOrOptions: string | LabelOptions) {
+		this._chart = chart;
 		const options = typeof textOrOptions === 'string' ? { text: textOrOptions } : textOrOptions;
 
 		this._text = options.text;
@@ -60,6 +65,9 @@ export class Label implements ChartElement {
 		}
 		if (options.align) {
 			this._align = options.align;
+		}
+		if (options.orthographic) {
+			this._orthographic = options.orthographic;
 		}
 		if (options.color) {
 			if (options.color.length === 3) {
@@ -150,22 +158,64 @@ export class Label implements ChartElement {
 		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
 	}
 
-	update(gl: WebGLRenderingContext) {
-		if (!this._program) {
-			this.compileShaders(gl);
+	private updateQuad(gl: WebGLRenderingContext) {
+		if (!this._positionBuffer) {
+			this._positionBuffer = gl.createBuffer();
 		}
-
-		if (this._positionBuffer) return;
-
-		this._positionBuffer = gl.createBuffer();
+		if (!this._offsetBuffer) {
+			this._offsetBuffer = gl.createBuffer();
+		}
 
 		this.updateTexture(gl);
 
 		const ratio = this._textSize[0] / this._textSize[1];
 
-		const positions = createQuad([0, 0, 1], Matrix4.scaling(ratio * this._quadHeight, this._quadHeight, 1.0));
-		gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+		if (this._orthographic) {
+			// prettier-ignore
+			const positions = new Float32Array([
+				0, 0, 0,
+				0, 0, 0,
+				0, 0, 0,
+				0, 0, 0,
+				0, 0, 0,
+				0, 0, 0,
+			]);
+			gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+			const pixelWidth = 1.0 / this._chart.camera.width;
+			const pixelHeight = 1.0 / this._chart.camera.height;
+			const fontWidth = pixelWidth * this._textSize[0];
+			const fontHeight = pixelHeight * this._textSize[1];
+			const w = fontWidth;
+			const h = fontHeight;
+			// prettier-ignore
+			const offsets = new Float32Array([
+				-w, h,
+				-w, -h,
+				w, h,
+				w, -h,
+				w, h,
+				-w, -h,
+			]);
+			gl.bindBuffer(gl.ARRAY_BUFFER, this._offsetBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, offsets, gl.STATIC_DRAW);
+
+		} else {
+			const positions = createQuad([0, 0, 1], Matrix4.scaling(ratio * this._quadHeight, this._quadHeight, 1.0));
+			gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+		}
+	}
+
+	update(gl: WebGLRenderingContext) {
+		if (!this._program) {
+			this.compileShaders(gl);
+		}
+
+		if (!this._orthographic && this._positionBuffer) return;
+
+		this.updateQuad(gl);
 	}
 
 	draw(gl: WebGLRenderingContext, camera: Camera) {
@@ -173,6 +223,9 @@ export class Label implements ChartElement {
 		prog.use();
 
 		prog.bindAttribute('position', this._positionBuffer, 3);
+		if (this._orthographic) {
+			prog.bindAttribute('offset', this._offsetBuffer, 2);
+		}
 		prog.bindAttribute('uv', this._uvBuffer, 2);
 		prog.setCamera(camera);
 
@@ -190,6 +243,7 @@ export class Label implements ChartElement {
 				break;
 		}
 		prog.setUniform('u_model', trans);
+		prog.setUniform('u_orthgraphic', this._orthographic);
 
 		const textureUnit = 1;
 		prog.setUniform('u_texture', textureUnit, gl.INT);

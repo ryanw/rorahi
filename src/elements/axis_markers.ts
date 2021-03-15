@@ -31,12 +31,13 @@ export class AxisMarkers implements ChartElement {
 
 		for (let i = 0; i < 17; i++) {
 			const labelTrans = Matrix4.identity()
-				.multiply(Matrix4.translation(-0.5 + i * (1 / 16), -0.5, 0.55))
+				.multiply(Matrix4.translation(-0.5 + i * (1 / 16), -0.5, 0.56))
 				.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
 				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
-			const label = new Label({
+			const label = new Label(chart, {
 				text: `${i}`,
-				fontSize: 48,
+				fontSize: 16,
+				orthographic: true,
 				color: [1.0, 0.0, 0.0],
 				align: LabelAlign.RIGHT,
 				transform: labelTrans,

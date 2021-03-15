@@ -64,6 +64,9 @@ export class Program {
 	) {
 		const gl = this._gl;
 		const loc = gl.getAttribLocation(this._webGLProgram, name);
+		if (loc === -1) {
+			throw `Unable to shader attribute: ${name}`;
+		}
 		gl.enableVertexAttribArray(loc);
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 		gl.vertexAttribPointer(loc, size, attrType, false, stride, offset);
