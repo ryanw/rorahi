@@ -191,12 +191,12 @@ export class Label implements ChartElement {
 			const h = fontHeight;
 			// prettier-ignore
 			const offsets = new Float32Array([
-				-w, h,
-				-w, -h,
-				w, h,
-				w, -h,
-				w, h,
-				-w, -h,
+				-w, 0,
+				-w, -h * 2,
+				w, 0,
+				w, -h * 2,
+				w, 0,
+				-w, -h * 2,
 			]);
 			gl.bindBuffer(gl.ARRAY_BUFFER, this._offsetBuffer);
 			gl.bufferData(gl.ARRAY_BUFFER, offsets, gl.STATIC_DRAW);
