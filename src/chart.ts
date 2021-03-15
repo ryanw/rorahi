@@ -113,56 +113,6 @@ export class Chart<T extends ArrayLike<number>> {
 		// Walls
 		this._elements.push(new Walls(this));
 
-		/*
-		// X Marker Labels
-		for (let i = 0; i < 17; i++) {
-			const labelTrans = Matrix4.identity()
-				.multiply(Matrix4.translation(-0.5 + (i * (1/16)), -0.5, 0.55))
-				.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
-				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
-			const label = new Label({
-				text: `${i}`,
-				fontSize: 48,
-				color: [1.0, 0.0, 0.0],
-				align: LabelAlign.RIGHT,
-				transform: labelTrans,
-			});
-			this._elements.push(label);
-		}
-
-		// Y (up) Marker Labels
-		for (let i = 1; i < 10; i++) {
-			const labelTrans = Matrix4.identity()
-				.multiply(Matrix4.translation(-0.5, -0.5 + (i * (1/9)), 0.55))
-				//.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
-				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
-			const label = new Label({
-				text: `${i}`,
-				fontSize: 48,
-				color: [0.0, 0.6, 0.0],
-				align: LabelAlign.RIGHT,
-				transform: labelTrans,
-			});
-			this._elements.push(label);
-		}
-
-		// Z (forward) Marker Labels
-		for (let i = 0; i < 17; i++) {
-			const labelTrans = Matrix4.identity()
-				.multiply(Matrix4.translation(0.57, -0.5, 0.50 - (i * (1/16))))
-				.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
-				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
-			const label = new Label({
-				text: `${i}`,
-				fontSize: 48,
-				color: [0.0, 0.0, 1.0],
-				align: LabelAlign.CENTER,
-				transform: labelTrans,
-			});
-			this._elements.push(label);
-		}
-		*/
-
 		// X axis
 		this._elements.push(new AxisMarkers(this, Axis.X, Matrix4.translation(0.0, 0.0, 0.02)));
 		this._elements.push(new AxisMarkers(this, Axis.X, Matrix4.translation(0.0, 0.0, -1.02)));
