@@ -354,7 +354,18 @@ export class Chart<T extends ArrayLike<number>> {
 		const x = -mX * mouseSpeed;
 		const y = -mY * mouseSpeed;
 
-		this.camera.rotate(x, y);
+		if (e.buttons & 1) {
+			// Left drag
+			this.camera.rotate(x, y);
+		} else if (e.buttons & 4) {
+			// Middle drag
+			this.camera.distance *= 1.0 + y;
+			if (this.camera.distance < 1) {
+				this.camera.distance = 1;
+			} else if (this.camera.distance > 8) {
+				this.camera.distance = 8;
+			}
+		}
 		this.draw();
 	};
 
