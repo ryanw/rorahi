@@ -1,6 +1,18 @@
 import { Chart, Camera, Gradient } from 'rorahi';
 import SimplexNoise from './simplex-noise';
 
+function hexToColor(hex: string): [number, number, number] {
+	const matches = hex.match(/#(..)(..)(..)/)
+	const r = matches[1];
+	const g = matches[2];
+	const b = matches[3];
+	return [
+		parseInt(r, 16) / 255,
+		parseInt(g, 16) / 255,
+		parseInt(b, 16) / 255,
+	];
+}
+
 const SIZE = 200;
 function main() {
 	const width = parseFloat((document.querySelector('#x-scale') as HTMLInputElement).value);
@@ -11,6 +23,9 @@ function main() {
 	const smooth = (document.querySelector('#smooth') as HTMLInputElement).checked;
 	const showContours = (document.querySelector('#contours') as HTMLInputElement).checked;
 	const showGrid = (document.querySelector('#grid') as HTMLInputElement).checked;
+
+	const colorInputs = Array.from(document.querySelectorAll('.gradient input[type="color"]')) as HTMLInputElement[];
+	const colors = colorInputs.map(input => hexToColor(input.value)).reverse();
 
 	const data = generateData(0, 0, SIZE, SIZE, 1.0);
 	console.debug("DATA", data);
@@ -36,17 +51,7 @@ function main() {
 				range: [-100, 100],
 			},
 		},
-		gradient: new Gradient([
-			[0.0, 0.0, 0.0],
-			[0.5, 0.0, 1.0],
-			[0.0, 0.0, 1.0],
-			[0.0, 1.0, 1.0],
-			[0.0, 1.0, 0.0],
-			[1.0, 1.0, 0.0],
-			[1.0, 0.5, 0.0],
-			[1.0, 0.0, 0.0],
-			[0.5, 0.0, 0.0],
-		], smooth),
+		gradient: new Gradient(colors, smooth),
 	});
 	chart.attach('#example-graph');
 
@@ -111,6 +116,14 @@ function main() {
 		const value = el.checked;
 		chart.showGrid = value;
 	});
+
+	for (const input of colorInputs) {
+		input.addEventListener('input', (e: InputEvent) => {
+			const colors = colorInputs.map(input => hexToColor(input.value)).reverse();
+			chart.gradient = new Gradient(colors, chart.gradient.smooth);
+			chart.draw();
+		});
+	}
 }
 
 

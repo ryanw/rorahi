@@ -60,7 +60,7 @@ export class Chart<T extends ArrayLike<number>> {
 	private _heightmap: Heightmap<T>;
 	private _showContours = false;
 	private _showGrid = false;
-	readonly gradient: Gradient;
+	gradient: Gradient;
 	camera = new Camera();
 
 	constructor(options?: ChartOptions<T>) {

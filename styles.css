@@ -64,3 +64,22 @@ form {
 .form-field input + .range-value {
 	text-align: left;
 }
+.form-field.gradient li:hover > button {
+}
+.form-field.gradient li > button.remove {
+	visibility: hidden;
+	padding: 0;
+}
+.form-field.gradient li:hover > button.remove {
+	visibility: visible;
+}
+.form-field.gradient li > input,
+.form-field.gradient li > button {
+	height: 32px;
+	margin: 4px;
+}
+.form-field.gradient ul, .form-field.gradient li {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
