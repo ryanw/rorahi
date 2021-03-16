@@ -34,6 +34,7 @@ export interface ChartOptions<T extends ArrayLike<number>> {
 export interface ChartElement {
 	update?(gl: WebGLRenderingContext): void;
 	draw?(gl: WebGLRenderingContext, camera: Camera): void;
+	hidden?: boolean;
 }
 
 const DEFAULT_COLORS: RGB[] = [
@@ -413,6 +414,7 @@ export class Chart<T extends ArrayLike<number>> {
 		gl.clearColor(0.0, 0.0, 0.0, 0.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		for (const element of this._elements) {
+			if (element.hidden) continue;
 			element.draw(gl, this.camera);
 		}
 	}

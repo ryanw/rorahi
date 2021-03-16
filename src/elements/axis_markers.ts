@@ -17,7 +17,6 @@ export class AxisMarkers implements ChartElement {
 	private _positionBuffer: WebGLBuffer;
 	private _program: Program;
 	private _chart: Chart<any>;
-	private _tickCount: number;
 	private _axis: Axis;
 	private _labels: Label[] = [];
 	transform: Matrix4 = Matrix4.identity();
@@ -28,19 +27,15 @@ export class AxisMarkers implements ChartElement {
 		if (transform) {
 			this.transform = transform;
 		}
+		if (axis !== 0) return;
 
-		for (let i = 0; i < 17; i++) {
-			const labelTrans = Matrix4.identity()
-				.multiply(Matrix4.translation(-0.5 + i * (1 / 16), -0.5, 0.53))
-				.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
-				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
+		for (let i = 0; i < 32; i++) {
 			const label = new Label(chart, {
 				text: `${i}`,
 				fontSize: 16,
 				orthographic: true,
 				color: [1.0, 0.0, 0.0],
 				align: LabelAlign.RIGHT,
-				transform: labelTrans,
 			});
 			this._labels.push(label);
 			this._chart.addElement(label);
@@ -57,6 +52,8 @@ export class AxisMarkers implements ChartElement {
 			this.compileShaders(gl);
 		}
 
+		this.updateLabels();
+
 		if (this._positionBuffer) return;
 		this._positionBuffer = gl.createBuffer();
 		const transform = Matrix4.identity()
@@ -68,11 +65,38 @@ export class AxisMarkers implements ChartElement {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 	}
 
+	private updateLabels() {
+		const region = this._chart.region;
+		const gridScale = 5.0;
+		const gridSize = [(1.0 / region[2]) * gridScale, (1.0 / region[3]) * gridScale];
+
+		for (let i = 0; i < this._labels.length; i++) {
+			const label = this._labels[i];
+			label.text = Math.floor(Math.floor(region[0] / gridScale) * gridScale + i * gridScale).toString();
+			let x = -0.5 - (region[0] % gridScale) / region[2] + (i * gridSize[0]);
+			let y = -0.5;
+
+			// If outside the chart, hide it
+			if (x < -0.51 || x > 0.51) {
+				label.hidden = true;
+				continue;
+			}
+			label.hidden = false;
+			const labelTrans = this.transform
+				.multiply(Matrix4.translation(x, y, 0.53))
+				.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
+				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
+
+			label.transform = labelTrans;
+		}
+	}
+
 	draw(gl: WebGLRenderingContext, camera: Camera) {
 		const prog = this._program;
 		prog.use();
 
 		// Grid size
+		// FIXME DRY THIS
 		const region = this._chart.region;
 		const gridScale = 5.0;
 		const gridSize = [(1.0 / region[2]) * gridScale, (1.0 / region[3]) * gridScale];

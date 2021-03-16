@@ -35,12 +35,14 @@ export interface LabelOptions {
 	orthographic?: boolean;
 }
 
+// Reuse shaders per GL context
+const PROGRAMS: Map<WebGLRenderingContext, Program> = new Map();
+
 export class Label implements ChartElement {
 	private _positionBuffer: WebGLBuffer;
 	private _offsetBuffer: WebGLBuffer;
 	private _uvBuffer: WebGLBuffer;
 	private _text: string;
-	private _program: Program;
 	private _textureSize = [0, 0];
 	private _texture: WebGLTexture;
 	private _textSize = [0, 0];
@@ -50,6 +52,9 @@ export class Label implements ChartElement {
 	private _color: RGBA = [0.0, 0.0, 0.0, 1.0];
 	private _orthographic = false;
 	private _chart: Chart<any>;
+	private _canvas = document.createElement('canvas');
+	private _previousCameraSize: [number, number] = [0, 0];
+	hidden: boolean = false;
 	transform = Matrix4.identity();
 
 	constructor(chart: Chart<any>, textOrOptions: string | LabelOptions) {
@@ -83,40 +88,49 @@ export class Label implements ChartElement {
 	}
 
 	set text(text: string) {
+		if (this._text === text) return;
 		this._text = text;
-		// FIXME update texture
+		this.updateQuad();
 	}
 
 	get fontSize(): number {
 		return this._fontSize;
 	}
 
+	get deviceFontSize(): number {
+		return this._fontSize * window.devicePixelRatio;
+	}
+
 	set fontSize(fontSize: number) {
+		if (this._fontSize === fontSize) return;
 		this._fontSize = fontSize;
-		// FIXME update texture
+		this.updateQuad();
 	}
 
 	private compileShaders(gl: WebGLRenderingContext) {
-		this._program = new Program(gl, LabelVertexShader, LabelFragmentShader);
-		this._program.compile();
+		const program = new Program(gl, LabelVertexShader, LabelFragmentShader);
+		program.compile();
+		PROGRAMS.set(gl, program);
 	}
 
-	private updateTexture(gl: WebGLRenderingContext) {
-		const pad = (this._fontSize * 0.2) | 0;
-		const canvas = document.createElement('canvas');
+	private updateTexture() {
+		const fontSize = this.deviceFontSize;
+		const gl = this._chart.gl;
+		const pad = (fontSize * 0.2) | 0;
+		const canvas = this._canvas;
 		const ctx = canvas.getContext('2d');
-		ctx.font = `${this._fontSize}px sans-serif`;
+		ctx.font = `${fontSize}px sans-serif`;
 		ctx.textBaseline = 'top';
 
 		const size = ctx.measureText(this._text);
 		const textWidth = size.width;
-		const textHeight = this._fontSize + pad;
+		const textHeight = fontSize + pad;
 		const imgWidth = nextPow2(textWidth);
 		const imgHeight = nextPow2(textHeight);
 
 		canvas.width = imgWidth;
 		canvas.height = imgHeight;
-		ctx.font = `${this._fontSize}px sans-serif`;
+		ctx.font = `${fontSize}px sans-serif`;
 		ctx.textBaseline = 'top';
 		ctx.fillStyle = `rgba(${this._color.map((c) => c * 255).join(',')})`;
 		ctx.fillText(this._text, 0, pad);
@@ -158,7 +172,8 @@ export class Label implements ChartElement {
 		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
 	}
 
-	private updateQuad(gl: WebGLRenderingContext) {
+	private updateQuad() {
+		const gl = this._chart.gl;
 		if (!this._positionBuffer) {
 			this._positionBuffer = gl.createBuffer();
 		}
@@ -166,7 +181,7 @@ export class Label implements ChartElement {
 			this._offsetBuffer = gl.createBuffer();
 		}
 
-		this.updateTexture(gl);
+		this.updateTexture();
 
 		const ratio = this._textSize[0] / this._textSize[1];
 
@@ -209,17 +224,21 @@ export class Label implements ChartElement {
 	}
 
 	update(gl: WebGLRenderingContext) {
-		if (!this._program) {
+		if (!PROGRAMS.get(gl)) {
 			this.compileShaders(gl);
 		}
 
 		if (!this._orthographic && this._positionBuffer) return;
 
-		this.updateQuad(gl);
+		// If window is resized, update quad shape
+		if (this._previousCameraSize[0] != this._chart.camera.width || this._previousCameraSize[1] != this._chart.camera.height) {
+			this._previousCameraSize = [this._chart.camera.width, this._chart.camera.height];
+			this.updateQuad();
+		}
 	}
 
 	draw(gl: WebGLRenderingContext, camera: Camera) {
-		const prog = this._program;
+		const prog = PROGRAMS.get(gl);
 		prog.use();
 
 		prog.bindAttribute('position', this._positionBuffer, 3);
@@ -230,7 +249,7 @@ export class Label implements ChartElement {
 		prog.setCamera(camera);
 
 		// Scale quad to fit font
-		const scale = this._fontSize * 0.002;
+		const scale = this.deviceFontSize * 0.002;
 		const ratio = this._textSize[0] / this._textSize[1];
 		let trans = this.transform;
 		trans = trans.multiply(Matrix4.scaling(scale, scale, 1));
