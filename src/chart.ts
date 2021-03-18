@@ -22,6 +22,9 @@ export interface ChartOptions<T extends ArrayLike<number>> {
 	resolution?: number;
 	gradient?: Gradient | RGB[];
 	region?: Rect;
+	width?: number;
+	height?: number;
+	depth?: number;
 	showContours?: boolean;
 	showGrid?: boolean;
 	axes?: {
@@ -61,6 +64,9 @@ export class Chart<T extends ArrayLike<number>> {
 	private _heightmap: Heightmap<T>;
 	private _showContours = false;
 	private _showGrid = false;
+	private _width = 1.0;
+	private _height = 1.0;
+	private _depth = 1.0;
 	gradient: Gradient;
 	camera = new Camera();
 
@@ -75,6 +81,18 @@ export class Chart<T extends ArrayLike<number>> {
 
 		if (options?.dataRange) {
 			this._dataRange = [...options.dataRange];
+		}
+
+		if (options?.width) {
+			this._width = options.width;
+		}
+
+		if (options?.height) {
+			this._height = options.height;
+		}
+
+		if (options?.depth) {
+			this._depth = options.depth;
 		}
 
 		if (options?.region) {
@@ -105,30 +123,33 @@ export class Chart<T extends ArrayLike<number>> {
 			this._showGrid = options.showGrid;
 		}
 
+		const scale = Matrix4.scaling(this._width, this._height, this._depth);
 		// Heightmap visualisation
 		const heightmap = new Heightmap(this, this._resolution);
-		heightmap.transform = Matrix4.rotation(-Math.PI / 2, 0, 0);
+		heightmap.transform = scale.multiply(Matrix4.rotation(-Math.PI / 2, 0, 0));
 		this._elements.push(heightmap);
 		this._heightmap = heightmap;
 
 		// Walls
-		this._elements.push(new Walls(this));
+		const walls = new Walls(this);
+		walls.transform = scale.clone();
+		this._elements.push(walls);
 
 		// X axis
-		this._elements.push(new AxisMarkers(this, Axis.X, Matrix4.translation(0.0, 0.0, 0.02)));
-		this._elements.push(new AxisMarkers(this, Axis.X, Matrix4.translation(0.0, 0.0, -1.02)));
+		this._elements.push(new AxisMarkers(this, Axis.X, scale.multiply(Matrix4.translation(0.0, 0.0, 0.02))));
+		this._elements.push(new AxisMarkers(this, Axis.X, scale.multiply(Matrix4.translation(0.0, 0.0, -1.02))));
 
 		// Z axis (forward)
 		this._elements.push(
-			new AxisMarkers(this, Axis.Z, Matrix4.rotation(0, Math.PI / 2, 0).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
+			new AxisMarkers(this, Axis.Z, scale.multiply(Matrix4.rotation(0, Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
 		);
 		this._elements.push(
-			new AxisMarkers(this, Axis.Z, Matrix4.rotation(0, Math.PI / 2, 0).multiply(Matrix4.translation(0.0, 0.0, -1.02)))
+			new AxisMarkers(this, Axis.Z, scale.multiply(Matrix4.rotation(0, Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.0, -1.02)))
 		);
 
 		// Y axis (up)
 		this._elements.push(
-			new AxisMarkers(this, Axis.Y, Matrix4.rotation(0, 0, -Math.PI / 2).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
+			new AxisMarkers(this, Axis.Y, scale.multiply(Matrix4.rotation(0, 0, -Math.PI / 2)).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
 		);
 	}
 

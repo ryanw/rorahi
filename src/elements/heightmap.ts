@@ -206,14 +206,14 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		prog.setUniform('u_flat', true);
 
 		// Floor
-		let flatTransform = Matrix4.translation(0, -0.5, 0).multiply(this.transform);
+		let flatTransform = this.transform.multiply(Matrix4.translation(0, 0, -0.5));
 		prog.setUniform('u_model', flatTransform);
 		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.BACK);
 		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
 
 		// Ceiling
-		flatTransform = Matrix4.translation(0, 0.5, 0).multiply(this.transform);
+		flatTransform = this.transform.multiply(Matrix4.translation(0, 0, 0.5));
 		prog.setUniform('u_model', flatTransform);
 		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.FRONT);
