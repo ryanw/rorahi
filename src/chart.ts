@@ -71,7 +71,7 @@ export class Chart<T extends ArrayLike<number>> {
 	private _height = 1.0;
 	private _depth = 1.0;
 	gradient: Gradient;
-	camera = new Camera();
+	camera = new Camera({ rotation: [Math.PI / 4, -Math.PI / 6], distance: 2 });
 
 	constructor(options?: ChartOptions<T>) {
 		this._canvas = document.createElement('canvas');

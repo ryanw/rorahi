@@ -1,16 +1,41 @@
 import { Matrix4, Point3 } from './geom';
 
+export interface CameraOptions {
+	target?: Point3;
+	rotation?: [number, number];
+	distance?: number;
+	projection?: Matrix4;
+	fov?: number;
+}
+
 export class Camera {
 	width: number;
 	height: number;
 	near: number = 0.1;
 	far: number = 1000.0;
 	projection: Matrix4;
-	distance: number = 4.0;
+	distance: number = 3.0;
+	fov: number = 45;
 	target: Point3 = [0.0, 0.0, 0.0];
 	rotation = { lon: 0.0, lat: 0.0 };
 
-	constructor() {
+	constructor(options?: CameraOptions) {
+		if (options?.target) {
+			this.target = [...options.target];
+		}
+		if (options?.rotation) {
+			this.rotation = {lon: options.rotation[0], lat: options.rotation[1]};
+		}
+		if (options?.distance) {
+			this.distance = options.distance;
+		}
+		if (options?.projection) {
+			this.projection = options.projection.clone();
+		}
+		if (options?.fov) {
+			this.fov = options.fov;
+		}
+
 		this.resize(1, 1);
 	}
 
@@ -41,7 +66,7 @@ export class Camera {
 		this.width = width;
 		this.height = height;
 		const aspect = width / height;
-		this.projection = Matrix4.perspective(aspect, 45.0, this.near, this.far);
+		this.projection = Matrix4.perspective(aspect, this.fov, this.near, this.far);
 	}
 
 	zoom(amount: number) {

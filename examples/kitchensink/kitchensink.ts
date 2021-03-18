@@ -54,12 +54,6 @@ function main() {
 	});
 	chart.attach('#example-graph');
 
-	const camera: Camera = chart.camera;
-	camera.distance = 3;
-	camera.rotate(0, -Math.PI * 0.2);
-	camera.rotate(Math.PI * 0.1, 0);
-
-
 	// Time adjustment
 	document.querySelector('#time-range').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
