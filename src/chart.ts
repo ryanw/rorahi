@@ -63,7 +63,7 @@ export class Chart<T extends ArrayLike<number>> {
 	private _mouseEnabled = true;
 	private _region: Rect = [0, 0, 0, 0];
 	private _dataRange = [0.0, 1.0];
-	private _resolution = 64;
+	private _resolution = 128;
 	private _heightmap: Heightmap<T>;
 	private _showContours = false;
 	private _showGrid = false;
