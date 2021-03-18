@@ -5,18 +5,18 @@ import { Program } from '../program';
 import HeightmapVertexShader from '../shaders/heightmap.vert.glsl';
 import HeightmapFragmentShader from '../shaders/heightmap.frag.glsl';
 
-export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
+export class Heightmap implements ChartElement {
 	private _vertexBuffer: WebGLBuffer;
 	private _indexBuffer: WebGLBuffer;
 	private _resolution: number;
 	private _program: Program;
 	private _heightTexture: WebGLTexture;
-	private _chart: Chart<T>;
+	private _chart: Chart;
 	private _useFloatTextures: boolean = false;
 	private _useLinearFilter: boolean = true;
 	transform: Matrix4 = Matrix4.identity();
 
-	constructor(chart: Chart<T>, resolution: number) {
+	constructor(chart: Chart, resolution: number) {
 		if (resolution < 1) {
 			throw `Heightmap must have resolution > 0`;
 		}
@@ -69,7 +69,7 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 
 		// Build our plane
 		const vertexSize = 3; // x, y, z
-		const triangles = new Uint16Array(width * height * 6);
+		const triangles = new Uint32Array(width * height * 6);
 		const vertices = new Float32Array(w * h * vertexSize);
 		const z = 0.0;
 		let tri = 0;
@@ -109,6 +109,9 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		const {
 			region: [sx, sy, width, height],
 		} = this._chart;
+
+		if (width === 0 || height === 0) return;
+
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this._heightTexture);
 
@@ -139,7 +142,6 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 			}
 		}
 
-		//const image = new ImageData(pixels, width);
 		gl.texImage2D(
 			gl.TEXTURE_2D,
 			0,
@@ -200,7 +202,7 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 
 		// Draw 3D surface
 		prog.setUniform('u_flat', false);
-		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
+		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
 
 		// Draw flat projections
 		prog.setUniform('u_flat', true);
@@ -210,13 +212,13 @@ export class Heightmap<T extends ArrayLike<number>> implements ChartElement {
 		prog.setUniform('u_model', flatTransform);
 		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.BACK);
-		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
+		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
 
 		// Ceiling
 		flatTransform = this.transform.multiply(Matrix4.translation(0, 0, 0.5));
 		prog.setUniform('u_model', flatTransform);
 		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.FRONT);
-		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
+		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
 	}
 }

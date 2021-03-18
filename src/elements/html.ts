@@ -3,13 +3,13 @@ import { Matrix4 } from '../geom';
 import { Camera } from '../camera';
 
 export class Html implements ChartElement {
-	private _chart: Chart<any>;
+	private _chart: Chart;
 	private _element: HTMLElement;
 	private _attached = false;
 
 	transform = Matrix4.identity();
 
-	constructor(chart: Chart<any>, html?: string | HTMLElement, transform?: Matrix4) {
+	constructor(chart: Chart, html?: string | HTMLElement, transform?: Matrix4) {
 		this._chart = chart;
 		if (html instanceof HTMLElement) {
 			this._element = html;

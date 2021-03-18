@@ -12,7 +12,7 @@ varying float v_height;
 void main(void) {
 	mat4 mvp = u_model * u_view * u_projection;
 	vec3 pos = position;
-	v_uv = vec2(position.x, position.y) + 0.5;
+	v_uv = vec2(position.x, -position.y) + 0.5;
 	vec3 color = texture2D(u_heights, v_uv).rgb;
 	if (!u_flat) {
 		pos.z = color.r - 0.5;

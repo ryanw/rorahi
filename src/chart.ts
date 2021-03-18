@@ -15,8 +15,8 @@ export interface AxisOptions {
 	range?: [number, number];
 }
 
-export interface ChartOptions<T extends ArrayLike<number>> {
-	data?: T;
+export interface ChartOptions {
+	data?: ArrayLike<number> | HTMLImageElement;
 	dataWidth?: number;
 	dataRange?: [number, number];
 	resolution?: number;
@@ -52,8 +52,9 @@ const DEFAULT_COLORS: RGB[] = [
 	[0.0, 0.0, 0.0],
 ];
 
-export class Chart<T extends ArrayLike<number>> {
-	private _data: T;
+export class Chart {
+	private _dataImage?: HTMLImageElement;
+	private _data: ArrayLike<number>;
 	private _dataWidth: number;
 	private _canvas: HTMLCanvasElement;
 	private _container: HTMLElement;
@@ -64,7 +65,7 @@ export class Chart<T extends ArrayLike<number>> {
 	private _region: Rect = [0, 0, 0, 0];
 	private _dataRange = [0.0, 1.0];
 	private _resolution = 128;
-	private _heightmap: Heightmap<T>;
+	private _heightmap: Heightmap;
 	private _showContours = false;
 	private _showGrid = false;
 	private _width = 1.0;
@@ -73,11 +74,18 @@ export class Chart<T extends ArrayLike<number>> {
 	gradient: Gradient;
 	camera = new Camera({ rotation: [Math.PI / 4, -Math.PI / 6], distance: 2 });
 
-	constructor(options?: ChartOptions<T>) {
+	constructor(options?: ChartOptions) {
 		this._canvas = document.createElement('canvas');
-		if (options?.data) {
+		if ('length' in options?.data) {
 			this.data = options.data;
 		}
+		else if (options?.data instanceof HTMLImageElement) {
+			this.dataImage = options.data;
+			if (!options.dataRange) {
+				this._dataRange = [0, 255];
+			}
+		}
+
 		if (options?.dataWidth) {
 			this._dataWidth = options.dataWidth;
 		}
@@ -100,7 +108,7 @@ export class Chart<T extends ArrayLike<number>> {
 
 		if (options?.region) {
 			this._region = [...options.region];
-		} else if (options?.data && options?.dataWidth) {
+		} else if ('length' in options?.data && options?.dataWidth) {
 			this._region = [0, 0, options.dataWidth, options.data.length / options.dataWidth];
 		}
 
@@ -144,10 +152,10 @@ export class Chart<T extends ArrayLike<number>> {
 
 		// Z axis (forward)
 		this._elements.push(
-			new AxisMarkers(this, Axis.Z, scale.multiply(Matrix4.rotation(0, Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
+			new AxisMarkers(this, Axis.Z, scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
 		);
 		this._elements.push(
-			new AxisMarkers(this, Axis.Z, scale.multiply(Matrix4.rotation(0, Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.0, -1.02)))
+			new AxisMarkers(this, Axis.Z, scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.0, -1.02)))
 		);
 
 		// Y axis (up)
@@ -168,7 +176,7 @@ export class Chart<T extends ArrayLike<number>> {
 		return this._container;
 	}
 
-	get data(): T {
+	get data(): ArrayLike<number> {
 		return this._data;
 	}
 
@@ -210,10 +218,45 @@ export class Chart<T extends ArrayLike<number>> {
 		this.draw();
 	}
 
-	set data(newData: T) {
+	set data(newData: ArrayLike<number>) {
 		this._data = newData;
 		this.update();
 		this.draw();
+	}
+
+	set dataImage(img: HTMLImageElement) {
+		this._dataImage = img;
+		const loaded = () => {
+			const canvas = document.createElement('canvas');
+			canvas.width = img.width;
+			canvas.height = img.height;
+			const ctx = canvas.getContext('2d');
+			ctx.drawImage(img, 0, 0);
+			const imgData = ctx.getImageData(0, 0, img.width, img.height);
+
+			// Average RGB together
+			const pixels = imgData.data;
+			const data = new Uint8ClampedArray(pixels.length / 4);
+			for (let i = 0; i < pixels.length; i += 4) {
+				const z = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+				data[i / 4] = z;
+			}
+			this._data = data;
+
+			this._dataWidth = imgData.width;
+			if (this._region[2] === 0 && this._region[3] === 0) {
+				this._region[2] = imgData.width;
+				this._region[3] = imgData.height;
+			}
+			this.update();
+			this.draw();
+		}
+		if (img.complete) {
+			loaded();
+		}
+		else {
+			img.addEventListener('load', loaded);
+		}
 	}
 
 	set xOffset(value: number) {
@@ -324,6 +367,9 @@ export class Chart<T extends ArrayLike<number>> {
 
 		// Enable `fwidth` in shader
 		gl.getExtension('OES_standard_derivatives');
+
+		// Enable 32bit index buffers
+		gl.getExtension('OES_element_index_uint');
 
 		gl.enable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);

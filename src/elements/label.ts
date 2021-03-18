@@ -51,13 +51,13 @@ export class Label implements ChartElement {
 	private _quadHeight = 0.2;
 	private _color: RGBA = [0.0, 0.0, 0.0, 1.0];
 	private _orthographic = false;
-	private _chart: Chart<any>;
+	private _chart: Chart;
 	private _canvas = document.createElement('canvas');
 	private _previousCameraSize: [number, number] = [0, 0];
 	hidden: boolean = false;
 	transform = Matrix4.identity();
 
-	constructor(chart: Chart<any>, textOrOptions: string | LabelOptions) {
+	constructor(chart: Chart, textOrOptions: string | LabelOptions) {
 		this._chart = chart;
 		const options = typeof textOrOptions === 'string' ? { text: textOrOptions } : textOrOptions;
 

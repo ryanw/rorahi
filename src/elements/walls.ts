@@ -10,10 +10,10 @@ export class Walls implements ChartElement {
 	private _positionBuffer: WebGLBuffer;
 	private _barycentricBuffer: WebGLBuffer;
 	private _program: Program;
-	private _chart: Chart<any>;
+	private _chart: Chart;
 	transform = Matrix4.identity();
 
-	constructor(chart: Chart<any>) {
+	constructor(chart: Chart) {
 		this._chart = chart;
 	}
 

@@ -16,12 +16,12 @@ export enum Axis {
 export class AxisMarkers implements ChartElement {
 	private _positionBuffer: WebGLBuffer;
 	private _program: Program;
-	private _chart: Chart<any>;
+	private _chart: Chart;
 	private _axis: Axis;
 	private _labels: Label[] = [];
 	transform: Matrix4 = Matrix4.identity();
 
-	constructor(chart: Chart<any>, axis: Axis, transform?: Matrix4) {
+	constructor(chart: Chart, axis: Axis, transform?: Matrix4) {
 		this._chart = chart;
 		this._axis = axis;
 		if (transform) {
