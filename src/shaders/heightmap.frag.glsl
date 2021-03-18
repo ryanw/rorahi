@@ -28,48 +28,50 @@ float gridPixel(vec2 uv) {
 	return 1.0 - min(line, 1.0);
 }
 
-float contourPixel(float uv) {
-	uv *= float(u_intervalCount);
-	float line = abs(fract(uv - 0.5) - 0.5) / fwidth(uv);
+float contourPixel(float height) {
+	height *= float(u_intervalCount);
+	float heightFract = abs(fract(height - 0.5) - 0.5);
+	float fheight = fwidth(height);
+	// Hack to avoid random static caused by floating point errors
+	if (fract(fheight) < 0.0001) {
+		fheight = floor(fheight);
+	}
+
+	float line = heightFract / fheight;
 
 	return 1.0 - min(line, 1.0);
 }
 
 void main(void) {
 	vec3 color = vec3(1.0, 0.0, 1.0);
+	float colorOffset = 1.0 - v_height;
 
 	// Vertical color gradient
 	if (u_smoothGradient) {
-		float idx = v_height / (1.0 / float(u_intervalCount)) - 0.5;
+		float idx = float(u_intervalCount) * colorOffset - 0.5;
 		int b = int(ceil(idx));
 		int t = int(floor(idx));
-		// Exact colour
-		if (b == t) {
-			int interval = int(idx);
-			for (int i = 0; i < 64; i++) {
-				if (i == interval) {
-					color = u_intervals[i];
-				}
-			}
-		}
-		else {
-			vec3 topColor = vec3(0.0);
-			vec3 bottomColor = vec3(0.0);
-			for (int i = 0; i < 64; i++) {
-				if (i == t) {
-					topColor = u_intervals[i];
-				}
-				if (i == b) {
-					bottomColor = u_intervals[i];
-				}
-			}
-
-			color = mix(topColor, bottomColor, fract(idx));
-		}
-	} else {
-		int interval = int(v_height / (1.0 / float(u_intervalCount)));
+		vec3 topColor = vec3(0.0);
+		vec3 bottomColor = vec3(0.0);
 		for (int i = 0; i < 64; i++) {
-			if (i == interval) {
+			if (i == t) {
+				topColor = u_intervals[i];
+			}
+			if (i == b) {
+				bottomColor = u_intervals[i];
+			}
+		}
+
+		color = mix(topColor, bottomColor, fract(idx));
+	} else {
+		float colorIndexf = float(u_intervalCount) * colorOffset;
+		// Hack to avoid random static caused by floating point errors
+		if (fract(colorIndexf) < 0.00001) {
+			colorIndexf -= 0.00001;
+		}
+		int colorIndex = int(colorIndexf);
+		for (int i = 0; i < 64; i++) {
+			if (i == colorIndex) {
 				color = u_intervals[i];
 			}
 		}
