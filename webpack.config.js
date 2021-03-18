@@ -8,6 +8,7 @@ module.exports = {
 	entry: {
 		rorahi: './src/index.ts',
 		'example.kitchensink': './examples/kitchensink/kitchensink.ts',
+		'example.simple': './examples/simple/simple.ts',
 	},
 	output: {
 		filename: '[name].js',
