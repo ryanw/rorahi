@@ -1,5 +1,5 @@
 import { Chart, Camera, Gradient } from 'rorahi';
-import SimplexNoise from './simplex-noise';
+import SimplexNoise from '../simplex-noise';
 
 function hexToColor(hex: string): [number, number, number] {
 	const matches = hex.match(/#(..)(..)(..)/)
@@ -25,10 +25,9 @@ function main() {
 	const showGrid = (document.querySelector('#grid') as HTMLInputElement).checked;
 
 	const colorInputs = Array.from(document.querySelectorAll('.gradient input[type="color"]')) as HTMLInputElement[];
-	const colors = colorInputs.map(input => hexToColor(input.value)).reverse();
+	const colors = colorInputs.map(input => hexToColor(input.value));
 
 	const data = generateData(0, 0, SIZE, SIZE, 1.0);
-	console.debug("DATA", data);
 	const chart = new Chart({
 		data,
 		dataWidth: SIZE,
@@ -119,7 +118,7 @@ function main() {
 
 	for (const input of colorInputs) {
 		input.addEventListener('input', (e: InputEvent) => {
-			const colors = colorInputs.map(input => hexToColor(input.value)).reverse();
+			const colors = colorInputs.map(input => hexToColor(input.value));
 			chart.gradient = new Gradient(colors, chart.gradient.smooth);
 			chart.draw();
 		});

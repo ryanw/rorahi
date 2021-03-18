@@ -7,7 +7,7 @@ module.exports = {
 	mode: production ? 'production' : 'development',
 	entry: {
 		rorahi: './src/index.ts',
-		'example.heightmap': './examples/heightmap.ts',
+		'example.kitchensink': './examples/kitchensink/kitchensink.ts',
 	},
 	output: {
 		filename: '[name].js',
