@@ -41,12 +41,15 @@ export interface ChartElement {
 }
 
 const DEFAULT_COLORS: RGB[] = [
+	[0.5, 0.0, 0.0],
 	[1.0, 0.0, 0.0],
 	[1.0, 1.0, 0.0],
 	[0.0, 1.0, 0.0],
 	[0.0, 1.0, 1.0],
 	[0.0, 0.0, 1.0],
 	[1.0, 0.0, 1.0],
+	[0.5, 0.0, 0.5],
+	[0.0, 0.0, 0.0],
 ];
 
 export class Chart<T extends ArrayLike<number>> {
@@ -108,7 +111,7 @@ export class Chart<T extends ArrayLike<number>> {
 				this.gradient = new Gradient(options.gradient);
 			}
 		} else {
-			this.gradient = new Gradient(DEFAULT_COLORS);
+			this.gradient = new Gradient(DEFAULT_COLORS, true);
 		}
 
 		if (options?.resolution) {
