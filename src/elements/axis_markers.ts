@@ -18,6 +18,7 @@ export class AxisMarkers implements ChartElement {
 	private _program: Program;
 	private _chart: Chart;
 	private _axis: Axis;
+	private _labelCount = 10;
 	private _labels: Label[] = [];
 	transform: Matrix4 = Matrix4.identity();
 
@@ -29,7 +30,7 @@ export class AxisMarkers implements ChartElement {
 		}
 		if (axis !== 0) return;
 
-		for (let i = 0; i < 32; i++) {
+		for (let i = 0; i < this._labelCount + 2; i++) {
 			const label = new Label(chart, {
 				text: `${i}`,
 				fontSize: 16,
@@ -65,22 +66,52 @@ export class AxisMarkers implements ChartElement {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 	}
 
+	get spacing(): number {
+		const region = this._chart.region;
+		switch (this._axis) {
+			case Axis.X:
+				return region[2] / this._labelCount;
+
+			case Axis.Z:
+				return region[3] / this._labelCount;
+
+			default:
+				return 0;
+		}
+	}
+
 	private updateLabels() {
 		const region = this._chart.region;
-		const gridScale = 5.0;
-		const gridSize = [(1.0 / region[2]) * gridScale, (1.0 / region[3]) * gridScale];
+		const spacing = this.spacing;
+		const gridSize = [(1.0 / region[2]) * spacing, (1.0 / region[3]) * spacing];
 
 		for (let i = 0; i < this._labels.length; i++) {
 			const label = this._labels[i];
-			label.text = Math.floor(Math.floor(region[0] / gridScale) * gridScale + i * gridScale).toString();
-			let x = -0.5 - (region[0] % gridScale) / region[2] + (i * gridSize[0]);
+			label.text = Math.floor(Math.floor(region[0] / spacing) * spacing + i * spacing).toString();
+			let x = -0.5;
 			let y = -0.5;
 
-			// If outside the chart, hide it
-			if (x < -0.51 || x > 0.51) {
-				label.hidden = true;
-				continue;
+			switch (this._axis) {
+				case Axis.X:
+					x = -0.5 - (region[0] % spacing) / region[2] + (i * gridSize[0]);
+					// If outside the chart, hide it
+					if (x < -0.51 || x > 0.51) {
+						label.hidden = true;
+						continue;
+					}
+					break;
+
+				case Axis.Z:
+					y = -0.5 - (region[1] % spacing) / region[3] + (i * gridSize[1]);
+					// If outside the chart, hide it
+					if (y < -0.51 || y > 0.51) {
+						label.hidden = true;
+						continue;
+					}
+					break;
 			}
+
+
 			label.hidden = false;
 			const labelTrans = this.transform
 				.multiply(Matrix4.translation(x, y, 0.53))
@@ -98,9 +129,9 @@ export class AxisMarkers implements ChartElement {
 		// Grid size
 		// FIXME DRY THIS
 		const region = this._chart.region;
-		const gridScale = 5.0;
-		const gridSize = [(1.0 / region[2]) * gridScale, (1.0 / region[3]) * gridScale];
-		const gridOffset = [region[0] / gridScale, region[1] / gridScale];
+		const spacing = this.spacing;
+		const gridSize = [(1.0 / region[2]) * spacing, (1.0 / region[3]) * spacing];
+		const gridOffset = [region[0] / spacing, region[1] / spacing];
 		switch (this._axis) {
 			case Axis.X:
 				prog.setUniform('u_gridSize', gridSize[0]);

@@ -2,8 +2,6 @@ import { Matrix4, Point2, Point3, Rect } from './geom';
 import { Camera } from './camera';
 import { Heightmap } from './elements/heightmap';
 import { Walls } from './elements/walls';
-import { Html } from './elements/html';
-import { Label, LabelAlign } from './elements/label';
 import { AxisMarkers, Axis } from './elements/axis_markers';
 import { RGB } from './color';
 import { Gradient } from './gradient';
@@ -27,6 +25,7 @@ export interface ChartOptions {
 	depth?: number;
 	showContours?: boolean;
 	showGrid?: boolean;
+	gridSize?: number | [number, number];
 	axes?: {
 		x?: AxisOptions;
 		y?: AxisOptions;
@@ -53,7 +52,6 @@ const DEFAULT_COLORS: RGB[] = [
 ];
 
 export class Chart {
-	private _dataImage?: HTMLImageElement;
 	private _data: ArrayLike<number>;
 	private _dataWidth: number;
 	private _canvas: HTMLCanvasElement;
@@ -63,6 +61,7 @@ export class Chart {
 	private _resizeObserver: ResizeObserver;
 	private _mouseEnabled = true;
 	private _region: Rect = [0, 0, 0, 0];
+	private _gridSize = [5.0, 5.0];
 	private _dataRange = [0.0, 1.0];
 	private _resolution = 128;
 	private _heightmap: Heightmap;
@@ -132,6 +131,15 @@ export class Chart {
 
 		if (options?.showGrid) {
 			this._showGrid = options.showGrid;
+		}
+
+		if (options?.gridSize) {
+			if (typeof options.gridSize === 'number') {
+				this._gridSize = [options.gridSize, options.gridSize];
+			}
+			else {
+				this._gridSize = [...options.gridSize];
+			}
 		}
 
 		const scale = Matrix4.scaling(this._width, this._height, this._depth);
@@ -225,7 +233,6 @@ export class Chart {
 	}
 
 	set dataImage(img: HTMLImageElement) {
-		this._dataImage = img;
 		const loaded = () => {
 			const canvas = document.createElement('canvas');
 			canvas.width = img.width;
@@ -289,6 +296,10 @@ export class Chart {
 
 	get dataHeight(): number {
 		return this._data.length / this._dataWidth;
+	}
+
+	get gridSize(): [number, number] {
+		return [this._gridSize[0], this._gridSize[1]];
 	}
 
 	addElement(el: ChartElement) {

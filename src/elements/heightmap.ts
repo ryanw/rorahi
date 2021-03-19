@@ -186,9 +186,9 @@ export class Heightmap implements ChartElement {
 
 		// Grid size
 		const region = this._chart.region;
-		const gridScale = 5.0;
-		const gridSize = [(1.0 / region[2]) * gridScale, (1.0 / region[3]) * gridScale];
-		const gridOffset = [region[0] / gridScale, region[1] / gridScale];
+		const gridScale = this._chart.gridSize;
+		const gridSize = [(1.0 / region[2]) * gridScale[0], (1.0 / region[3]) * gridScale[1]];
+		const gridOffset = [region[0] / gridScale[0], region[1] / gridScale[1]];
 		prog.setUniform('u_gridSize', gridSize);
 		prog.setUniform('u_gridOffset', gridOffset);
 

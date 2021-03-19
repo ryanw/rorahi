@@ -1,4 +1,4 @@
-import { Chart, Camera, Gradient } from 'rorahi';
+import { Chart, Gradient } from 'rorahi';
 import SimplexNoise from '../simplex-noise';
 
 function hexToColor(hex: string): [number, number, number] {
@@ -36,6 +36,7 @@ function main() {
 		region: [xOffset, yOffset, width, height],
 		showContours,
 		showGrid,
+		gridSize: [10, 20],
 		axes: {
 			x: {
 				label: 'Foo',
@@ -111,7 +112,7 @@ function main() {
 	});
 
 	for (const input of colorInputs) {
-		input.addEventListener('input', (e: InputEvent) => {
+		input.addEventListener('input', () => {
 			const colors = colorInputs.map(input => hexToColor(input.value));
 			chart.gradient = new Gradient(colors, chart.gradient.smooth);
 			chart.draw();
