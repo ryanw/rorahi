@@ -23,6 +23,7 @@ function main() {
 	const smooth = (document.querySelector('#smooth') as HTMLInputElement).checked;
 	const showContours = (document.querySelector('#contours') as HTMLInputElement).checked;
 	const showGrid = (document.querySelector('#grid') as HTMLInputElement).checked;
+	const showWalls = (document.querySelector('#walls') as HTMLInputElement).checked;
 	const showFloor = (document.querySelector('#floor') as HTMLInputElement).checked;
 	const showCeiling = (document.querySelector('#ceiling') as HTMLInputElement).checked;
 
@@ -38,6 +39,7 @@ function main() {
 		region: [xOffset, yOffset, width, height],
 		showContours,
 		showGrid,
+		showWalls,
 		showFloor,
 		showCeiling,
 		gridSize: [10, 20],
@@ -113,6 +115,12 @@ function main() {
 		const el = e.target as HTMLInputElement;
 		const value = el.checked;
 		chart.showGrid = value;
+	});
+
+	document.querySelector('#walls').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = el.checked;
+		chart.showWalls = value;
 	});
 
 	document.querySelector('#floor').addEventListener('input', (e: InputEvent) => {

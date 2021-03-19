@@ -11,6 +11,7 @@ export class Walls implements ChartElement {
 	private _barycentricBuffer: WebGLBuffer;
 	private _program: Program;
 	private _chart: Chart;
+	hidden = false;
 	transform = Matrix4.identity();
 
 	constructor(chart: Chart) {

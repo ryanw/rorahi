@@ -25,6 +25,7 @@ export interface ChartOptions {
 	depth?: number;
 	showContours?: boolean;
 	showGrid?: boolean;
+	showWalls?: boolean;
 	gridSize?: number | [number, number];
 	showFloor?: boolean;
 	showCeiling?: boolean;
@@ -69,6 +70,7 @@ export class Chart {
 	private _heightmap: Heightmap;
 	private _showContours = false;
 	private _showGrid = false;
+	private _showWalls = false;
 	private _width = 1.0;
 	private _height = 1.0;
 	private _depth = 1.0;
@@ -137,6 +139,10 @@ export class Chart {
 			this._showGrid = options.showGrid;
 		}
 
+		if (options?.showWalls) {
+			this._showWalls = options.showWalls;
+		}
+
 		if (options?.showFloor) {
 			this._showFloor = options.showFloor;
 		}
@@ -164,6 +170,7 @@ export class Chart {
 		// Walls
 		const walls = new Walls(this);
 		walls.transform = scale.clone();
+		walls.hidden = !this._showWalls;
 		this._elements.push(walls);
 
 		// X axis
@@ -229,6 +236,20 @@ export class Chart {
 
 	set showGrid(showGrid: boolean) {
 		this._showGrid = showGrid;
+		this.draw();
+	}
+
+	get showWalls(): boolean {
+		return this._showWalls;
+	}
+
+	set showWalls(showWalls: boolean) {
+		this._showWalls = showWalls;
+		for (let el of this._elements) {
+			if (el instanceof Walls) {
+				el.hidden = !this._showWalls;
+			}
+		}
 		this.draw();
 	}
 
