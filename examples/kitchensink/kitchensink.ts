@@ -23,6 +23,8 @@ function main() {
 	const smooth = (document.querySelector('#smooth') as HTMLInputElement).checked;
 	const showContours = (document.querySelector('#contours') as HTMLInputElement).checked;
 	const showGrid = (document.querySelector('#grid') as HTMLInputElement).checked;
+	const showFloor = (document.querySelector('#floor') as HTMLInputElement).checked;
+	const showCeiling = (document.querySelector('#ceiling') as HTMLInputElement).checked;
 
 	const colorInputs = Array.from(document.querySelectorAll('.gradient input[type="color"]')) as HTMLInputElement[];
 	const colors = colorInputs.map(input => hexToColor(input.value));
@@ -36,6 +38,8 @@ function main() {
 		region: [xOffset, yOffset, width, height],
 		showContours,
 		showGrid,
+		showFloor,
+		showCeiling,
 		gridSize: [10, 20],
 		axes: {
 			x: {
@@ -109,6 +113,18 @@ function main() {
 		const el = e.target as HTMLInputElement;
 		const value = el.checked;
 		chart.showGrid = value;
+	});
+
+	document.querySelector('#floor').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = el.checked;
+		chart.showFloor = value;
+	});
+
+	document.querySelector('#ceiling').addEventListener('input', (e: InputEvent) => {
+		const el = e.target as HTMLInputElement;
+		const value = el.checked;
+		chart.showCeiling = value;
 	});
 
 	for (const input of colorInputs) {

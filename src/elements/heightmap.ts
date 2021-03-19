@@ -207,18 +207,22 @@ export class Heightmap implements ChartElement {
 		// Draw flat projections
 		prog.setUniform('u_flat', true);
 
-		// Floor
-		let flatTransform = this.transform.multiply(Matrix4.translation(0, 0, -0.5));
-		prog.setUniform('u_model', flatTransform);
-		gl.enable(gl.CULL_FACE);
-		gl.cullFace(gl.BACK);
-		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
+		if (this._chart.showFloor) {
+			// Floor
+			let flatTransform = this.transform.multiply(Matrix4.translation(0, 0, -0.5));
+			prog.setUniform('u_model', flatTransform);
+			gl.enable(gl.CULL_FACE);
+			gl.cullFace(gl.BACK);
+			gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
+		}
 
-		// Ceiling
-		flatTransform = this.transform.multiply(Matrix4.translation(0, 0, 0.5));
-		prog.setUniform('u_model', flatTransform);
-		gl.enable(gl.CULL_FACE);
-		gl.cullFace(gl.FRONT);
-		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
+		if (this._chart.showCeiling) {
+			// Ceiling
+			let flatTransform = this.transform.multiply(Matrix4.translation(0, 0, 0.5));
+			prog.setUniform('u_model', flatTransform);
+			gl.enable(gl.CULL_FACE);
+			gl.cullFace(gl.FRONT);
+			gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
+		}
 	}
 }

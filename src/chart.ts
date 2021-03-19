@@ -26,6 +26,8 @@ export interface ChartOptions {
 	showContours?: boolean;
 	showGrid?: boolean;
 	gridSize?: number | [number, number];
+	showFloor?: boolean;
+	showCeiling?: boolean;
 	axes?: {
 		x?: AxisOptions;
 		y?: AxisOptions;
@@ -70,6 +72,8 @@ export class Chart {
 	private _width = 1.0;
 	private _height = 1.0;
 	private _depth = 1.0;
+	private _showFloor = false;
+	private _showCeiling = false;
 	gradient: Gradient;
 	camera = new Camera({ rotation: [Math.PI / 4, -Math.PI / 6], distance: 2 });
 
@@ -131,6 +135,14 @@ export class Chart {
 
 		if (options?.showGrid) {
 			this._showGrid = options.showGrid;
+		}
+
+		if (options?.showFloor) {
+			this._showFloor = options.showFloor;
+		}
+
+		if (options?.showCeiling) {
+			this._showCeiling = options.showCeiling;
 		}
 
 		if (options?.gridSize) {
@@ -217,6 +229,24 @@ export class Chart {
 
 	set showGrid(showGrid: boolean) {
 		this._showGrid = showGrid;
+		this.draw();
+	}
+
+	get showFloor(): boolean {
+		return this._showFloor;
+	}
+
+	set showFloor(showFloor: boolean) {
+		this._showFloor = showFloor;
+		this.draw();
+	}
+
+	get showCeiling(): boolean {
+		return this._showCeiling;
+	}
+
+	set showCeiling(showCeiling: boolean) {
+		this._showCeiling = showCeiling;
 		this.draw();
 	}
 
