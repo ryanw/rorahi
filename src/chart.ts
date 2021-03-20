@@ -2,7 +2,7 @@ import { Matrix4, Point2, Point3, Rect } from './geom';
 import { Camera } from './camera';
 import { Heightmap } from './elements/heightmap';
 import { Walls } from './elements/walls';
-import { AxisMarkers, Axis } from './elements/axis_markers';
+import { AxisMarkers, Axis, LabelAnchor } from './elements/axis_markers';
 import { RGB } from './color';
 import { Gradient } from './gradient';
 
@@ -174,21 +174,23 @@ export class Chart {
 		this._elements.push(walls);
 
 		// X axis
-		this._elements.push(new AxisMarkers(this, Axis.X, scale.multiply(Matrix4.translation(0.0, 0.0, 0.02))));
-		this._elements.push(new AxisMarkers(this, Axis.X, scale.multiply(Matrix4.translation(0.0, 0.0, -1.02))));
+		this._elements.push(new AxisMarkers(this, Axis.X, LabelAnchor.RIGHT, scale.multiply(Matrix4.translation(0.0, 0.5, 0.02))));
+		this._elements.push(new AxisMarkers(this, Axis.X, LabelAnchor.LEFT, scale.multiply(Matrix4.translation(0.0, 0.5, -1.02))));
 
 		// Z axis (forward)
 		this._elements.push(
-			new AxisMarkers(this, Axis.Z, scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
+			new AxisMarkers(this, Axis.Z, LabelAnchor.RIGHT, scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.5, 0.02)))
 		);
 		this._elements.push(
-			new AxisMarkers(this, Axis.Z, scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.0, -1.02)))
+			new AxisMarkers(this, Axis.Z, LabelAnchor.LEFT, scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.5, -1.02)))
 		);
 
 		// Y axis (up)
+		/*
 		this._elements.push(
 			new AxisMarkers(this, Axis.Y, scale.multiply(Matrix4.rotation(0, 0, -Math.PI / 2)).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
 		);
+		*/
 	}
 
 	get gl(): WebGLRenderingContext | null {

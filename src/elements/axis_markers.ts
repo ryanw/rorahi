@@ -1,5 +1,5 @@
 import { Chart, ChartElement } from '../chart';
-import { Matrix4 } from '../geom';
+import { Matrix4, Vector2 } from '../geom';
 import { Camera } from '../camera';
 import { createFace } from '../meshes';
 import { Program } from '../program';
@@ -13,29 +13,37 @@ export enum Axis {
 	Z,
 }
 
+export enum LabelAnchor {
+	LEFT,
+	RIGHT,
+}
+
 export class AxisMarkers implements ChartElement {
 	private _positionBuffer: WebGLBuffer;
 	private _program: Program;
 	private _chart: Chart;
 	private _axis: Axis;
 	private _labelCount = 10;
+	private _tickLimit = 8;
 	private _labels: Label[] = [];
+	private _labelAnchor: LabelAnchor;
 	transform: Matrix4 = Matrix4.identity();
 
-	constructor(chart: Chart, axis: Axis, transform?: Matrix4) {
+	constructor(chart: Chart, axis: Axis, labelAnchor: LabelAnchor = LabelAnchor.LEFT, transform?: Matrix4) {
 		this._chart = chart;
 		this._axis = axis;
 		if (transform) {
 			this.transform = transform;
 		}
+		this._labelAnchor = labelAnchor;
 
-		for (let i = 0; i < this._labelCount + 2; i++) {
+		for (let i = 0; i < this._labelCount; i++) {
 			const label = new Label(chart, {
 				text: `${i}`,
 				fontSize: 16,
 				orthographic: true,
 				color: [1.0, 0.0, 0.0],
-				align: LabelAlign.RIGHT,
+				align: labelAnchor === LabelAnchor.LEFT ? LabelAlign.LEFT : LabelAlign.RIGHT,
 			});
 			this._labels.push(label);
 			this._chart.addElement(label);
@@ -66,13 +74,12 @@ export class AxisMarkers implements ChartElement {
 	}
 
 	get spacing(): number {
-		const tickLimit = 8;
 		const grid = this._chart.gridSize;
 		const region = this._chart.region;
 		let interval;
 		switch (this._axis) {
 			case Axis.X:
-				interval = (tickLimit * grid[0]) / region[2];
+				interval = (this._tickLimit * grid[0]) / region[2];
 				if (interval >= 1) {
 					interval = Math.floor(interval);
 				}
@@ -82,7 +89,7 @@ export class AxisMarkers implements ChartElement {
 				return grid[0] / interval;
 
 			case Axis.Z:
-				interval = (tickLimit * grid[1]) / region[3];
+				interval = (this._tickLimit * grid[1]) / region[3];
 				if (interval >= 1) {
 					interval = Math.floor(interval);
 				}
@@ -104,7 +111,7 @@ export class AxisMarkers implements ChartElement {
 		for (let i = 0; i < this._labels.length; i++) {
 			const label = this._labels[i];
 			let x = -0.5;
-			let y = -0.5;
+			let y = -0.49;
 
 			switch (this._axis) {
 				case Axis.X:
@@ -126,7 +133,7 @@ export class AxisMarkers implements ChartElement {
 
 			label.hidden = false;
 			const labelTrans = this.transform
-				.multiply(Matrix4.translation(x, y, 0.53))
+				.multiply(Matrix4.translation(x, y, this._labelAnchor === LabelAnchor.LEFT ? 0.475 : 0.525))
 				.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
 				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
 
