@@ -28,7 +28,6 @@ export class AxisMarkers implements ChartElement {
 		if (transform) {
 			this.transform = transform;
 		}
-		if (axis !== 0) return;
 
 		for (let i = 0; i < this._labelCount + 2; i++) {
 			const label = new Label(chart, {
@@ -67,13 +66,30 @@ export class AxisMarkers implements ChartElement {
 	}
 
 	get spacing(): number {
+		const tickLimit = 8;
+		const grid = this._chart.gridSize;
 		const region = this._chart.region;
+		let interval;
 		switch (this._axis) {
 			case Axis.X:
-				return region[2] / this._labelCount;
+				interval = (tickLimit * grid[0]) / region[2];
+				if (interval >= 1) {
+					interval = Math.floor(interval);
+				}
+				else {
+					interval = 1/Math.floor(1/interval);
+				}
+				return grid[0] / interval;
 
 			case Axis.Z:
-				return region[3] / this._labelCount;
+				interval = (tickLimit * grid[1]) / region[3];
+				if (interval >= 1) {
+					interval = Math.floor(interval);
+				}
+				else {
+					interval = 1 / Math.floor(1 / interval);
+				}
+				return grid[1] / interval;
 
 			default:
 				return 0;
@@ -87,28 +103,24 @@ export class AxisMarkers implements ChartElement {
 
 		for (let i = 0; i < this._labels.length; i++) {
 			const label = this._labels[i];
-			label.text = Math.floor(Math.floor(region[0] / spacing) * spacing + i * spacing).toString();
 			let x = -0.5;
 			let y = -0.5;
 
 			switch (this._axis) {
 				case Axis.X:
+					label.text = Math.floor(Math.floor(region[0] / spacing) * spacing + i * spacing).toString();
 					x = -0.5 - (region[0] % spacing) / region[2] + (i * gridSize[0]);
-					// If outside the chart, hide it
-					if (x < -0.51 || x > 0.51) {
-						label.hidden = true;
-						continue;
-					}
 					break;
 
 				case Axis.Z:
-					y = -0.5 - (region[1] % spacing) / region[3] + (i * gridSize[1]);
-					// If outside the chart, hide it
-					if (y < -0.51 || y > 0.51) {
-						label.hidden = true;
-						continue;
-					}
+					label.text = Math.floor(Math.floor(region[1] / spacing) * spacing + i * spacing).toString();
+					x = -0.5 - (region[1] % spacing) / region[3] + (i * gridSize[1]);
 					break;
+			}
+			// If outside the chart, hide it
+			if (x < -0.51 || x > 0.51) {
+				label.hidden = true;
+				continue;
 			}
 
 
