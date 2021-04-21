@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"outDir": "./dist/",
+		"declaration": true,
+		"sourceMap": true,
+		"allowJs": true,
+		"noImplicitAny": true,
+		"esModuleInterop": true,
+		"module": "esnext",
+		"moduleResolution": "node",
+		"target": "es6",
+		"lib": ["es2019", "dom"],
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": "./"
+	},
+	"include": ["src/**/*"],
+	"exclude": ["examples/**/*"],
+	"typedocOptions": {
+		"entryPoints": ["./src/"],
+		"exclude": ["src/global.d.ts", "src/__mocks__", "src/**/*.test.ts"]
+	}
+}

@@ -1,7 +1,8 @@
 declare let PRODUCTION: boolean;
 
 declare module '*.glsl' {
-	export default string;
+	const glsl: string;
+	export default glsl;
 }
 
 interface Window {

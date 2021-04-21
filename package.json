@@ -7,7 +7,7 @@
   "scripts": {
     "server": "webpack serve",
     "build": "webpack",
-    "docs": "typedoc",
+    "docs": "typedoc --tsconfig tsconfig.typedoc.json",
     "test": "jest src",
     "pretty": "prettier -w src"
   },

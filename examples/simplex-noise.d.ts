@@ -40,7 +40,7 @@ declare class SimplexNoise
 	noise4D(x: number, y: number, z: number, w: number): number;
 }
 
-namespace SimplexNoise
+declare module SimplexNoise
 {
 	export type RandomNumberGenerator = {(): number};
 }
