@@ -9,7 +9,7 @@
     "build": "webpack",
     "docs": "typedoc",
     "test": "jest src",
-	"pretty": "prettier -w src"
+    "pretty": "prettier -w src"
   },
   "author": "Ryan Williams <git@ryan.nz>",
   "license": "MIT",
