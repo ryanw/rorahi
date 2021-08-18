@@ -12,7 +12,7 @@ function generateData(t: number = 0): Float32Array {
 			const xo = x - o;
 			const yo = y - o;
 			const distance = Math.sqrt(xo * xo + yo * yo);
-			const height = 1.0 - (distance / SIZE) * Math.PI / 2;
+			const height = 1.0 - ((distance / SIZE) * Math.PI) / 2;
 			data[i] = Math.sin(t + distance * SCALE) * height;
 		}
 	}
@@ -29,10 +29,9 @@ function main() {
 
 	let t = 0;
 	setInterval(() => {
-		chart.data = generateData(t += 0.1);
-	}, 1000/30);
+		chart.data = generateData((t += 0.1));
+	}, 1000 / 30);
 	chart.attach('#example-graph');
 }
-
 
 window.addEventListener('DOMContentLoaded', main);

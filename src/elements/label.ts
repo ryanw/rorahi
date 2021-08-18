@@ -215,7 +215,6 @@ export class Label implements ChartElement {
 			]);
 			gl.bindBuffer(gl.ARRAY_BUFFER, this._offsetBuffer);
 			gl.bufferData(gl.ARRAY_BUFFER, offsets, gl.STATIC_DRAW);
-
 		} else {
 			const positions = createQuad([0, 0, 1], Matrix4.scaling(ratio * this._quadHeight, this._quadHeight, 1.0));
 			gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer);
@@ -231,7 +230,10 @@ export class Label implements ChartElement {
 		if (!this._orthographic && this._positionBuffer) return;
 
 		// If window is resized, update quad shape
-		if (this._previousCameraSize[0] != this._chart.camera.width || this._previousCameraSize[1] != this._chart.camera.height) {
+		if (
+			this._previousCameraSize[0] != this._chart.camera.width ||
+			this._previousCameraSize[1] != this._chart.camera.height
+		) {
 			this._previousCameraSize = [this._chart.camera.width, this._chart.camera.height];
 			this.updateQuad();
 		}

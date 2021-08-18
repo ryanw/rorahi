@@ -2,15 +2,11 @@ import { Chart, Gradient } from 'rorahi';
 import SimplexNoise from '../simplex-noise';
 
 function hexToColor(hex: string): [number, number, number] {
-	const matches = hex.match(/#(..)(..)(..)/)
+	const matches = hex.match(/#(..)(..)(..)/);
 	const r = matches[1];
 	const g = matches[2];
 	const b = matches[3];
-	return [
-		parseInt(r, 16) / 255,
-		parseInt(g, 16) / 255,
-		parseInt(b, 16) / 255,
-	];
+	return [parseInt(r, 16) / 255, parseInt(g, 16) / 255, parseInt(b, 16) / 255];
 }
 
 const SIZE = 200;
@@ -28,7 +24,7 @@ function main() {
 	const showCeiling = (document.querySelector('#ceiling') as HTMLInputElement).checked;
 
 	const colorInputs = Array.from(document.querySelectorAll('.gradient input[type="color"]')) as HTMLInputElement[];
-	const colors = colorInputs.map(input => hexToColor(input.value));
+	const colors = colorInputs.map((input) => hexToColor(input.value));
 
 	const data = generateData(0, 0, SIZE, SIZE, 1.0);
 	const chart = new Chart({
@@ -137,13 +133,12 @@ function main() {
 
 	for (const input of colorInputs) {
 		input.addEventListener('input', () => {
-			const colors = colorInputs.map(input => hexToColor(input.value));
+			const colors = colorInputs.map((input) => hexToColor(input.value));
 			chart.gradient = new Gradient(colors, chart.gradient.smooth);
 			chart.draw();
 		});
 	}
 }
-
 
 const seed1 = Math.random().toString();
 const seed2 = Math.random().toString();
@@ -158,7 +153,7 @@ function generateData(startX: number, startY: number, width: number, height: num
 	const scale = 40;
 	function noise(x: number, y: number): number {
 		let n = simplex.noise3D(x / scale, y / scale, t) * 1.5;
-		n *= 1.0 - simplex2.noise3D(x / scale * 2, y / scale * 2, t) / 3;
+		n *= 1.0 - simplex2.noise3D((x / scale) * 2, (y / scale) * 2, t) / 3;
 
 		return n * 0.3 + 0.5;
 	}

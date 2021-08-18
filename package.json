@@ -9,7 +9,7 @@
     "build": "webpack",
     "docs": "typedoc --tsconfig tsconfig.typedoc.json",
     "test": "jest src",
-    "pretty": "prettier -w src"
+    "pretty": "prettier -w src -w examples/**/*.ts"
   },
   "author": "Ryan Williams <git@ryan.nz>",
   "license": "MIT",

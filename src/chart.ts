@@ -83,8 +83,7 @@ export class Chart {
 		this._canvas = document.createElement('canvas');
 		if ('length' in options?.data) {
 			this.data = options.data;
-		}
-		else if (options?.data instanceof HTMLImageElement) {
+		} else if (options?.data instanceof HTMLImageElement) {
 			this.dataImage = options.data;
 			if (!options.dataRange) {
 				this._dataRange = [0, 255];
@@ -154,8 +153,7 @@ export class Chart {
 		if (options?.gridSize) {
 			if (typeof options.gridSize === 'number') {
 				this._gridSize = [options.gridSize, options.gridSize];
-			}
-			else {
+			} else {
 				this._gridSize = [...options.gridSize];
 			}
 		}
@@ -174,15 +172,29 @@ export class Chart {
 		this._elements.push(walls);
 
 		// X axis
-		this._elements.push(new AxisMarkers(this, Axis.X, LabelAnchor.RIGHT, scale.multiply(Matrix4.translation(0.0, 0.5, 0.02))));
-		this._elements.push(new AxisMarkers(this, Axis.X, LabelAnchor.LEFT, scale.multiply(Matrix4.translation(0.0, 0.5, -1.02))));
+		this._elements.push(
+			new AxisMarkers(this, Axis.X, LabelAnchor.RIGHT, scale.multiply(Matrix4.translation(0.0, 0.5, 0.02)))
+		);
+		this._elements.push(
+			new AxisMarkers(this, Axis.X, LabelAnchor.LEFT, scale.multiply(Matrix4.translation(0.0, 0.5, -1.02)))
+		);
 
 		// Z axis (forward)
 		this._elements.push(
-			new AxisMarkers(this, Axis.Z, LabelAnchor.RIGHT, scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.5, 0.02)))
+			new AxisMarkers(
+				this,
+				Axis.Z,
+				LabelAnchor.RIGHT,
+				scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.5, 0.02))
+			)
 		);
 		this._elements.push(
-			new AxisMarkers(this, Axis.Z, LabelAnchor.LEFT, scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.5, -1.02)))
+			new AxisMarkers(
+				this,
+				Axis.Z,
+				LabelAnchor.LEFT,
+				scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.5, -1.02))
+			)
 		);
 
 		// Y axis (up)
@@ -310,11 +322,10 @@ export class Chart {
 			}
 			this.update();
 			this.draw();
-		}
+		};
 		if (img.complete) {
 			loaded();
-		}
-		else {
+		} else {
 			img.addEventListener('load', loaded);
 		}
 	}

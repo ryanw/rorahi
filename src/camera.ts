@@ -24,7 +24,7 @@ export class Camera {
 			this.target = [...options.target];
 		}
 		if (options?.rotation) {
-			this.rotation = {lon: options.rotation[0], lat: options.rotation[1]};
+			this.rotation = { lon: options.rotation[0], lat: options.rotation[1] };
 		}
 		if (options?.distance) {
 			this.distance = options.distance;

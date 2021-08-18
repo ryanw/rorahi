@@ -82,9 +82,8 @@ export class AxisMarkers implements ChartElement {
 				interval = (this._tickLimit * grid[0]) / region[2];
 				if (interval >= 1) {
 					interval = Math.floor(interval);
-				}
-				else {
-					interval = 1/Math.floor(1/interval);
+				} else {
+					interval = 1 / Math.floor(1 / interval);
 				}
 				return grid[0] / interval;
 
@@ -92,8 +91,7 @@ export class AxisMarkers implements ChartElement {
 				interval = (this._tickLimit * grid[1]) / region[3];
 				if (interval >= 1) {
 					interval = Math.floor(interval);
-				}
-				else {
+				} else {
 					interval = 1 / Math.floor(1 / interval);
 				}
 				return grid[1] / interval;
@@ -116,12 +114,12 @@ export class AxisMarkers implements ChartElement {
 			switch (this._axis) {
 				case Axis.X:
 					label.text = Math.floor(Math.floor(region[0] / spacing) * spacing + i * spacing).toString();
-					x = -0.5 - (region[0] % spacing) / region[2] + (i * gridSize[0]);
+					x = -0.5 - (region[0] % spacing) / region[2] + i * gridSize[0];
 					break;
 
 				case Axis.Z:
 					label.text = Math.floor(Math.floor(region[1] / spacing) * spacing + i * spacing).toString();
-					x = -0.5 - (region[1] % spacing) / region[3] + (i * gridSize[1]);
+					x = -0.5 - (region[1] % spacing) / region[3] + i * gridSize[1];
 					break;
 			}
 			// If outside the chart, hide it
@@ -129,7 +127,6 @@ export class AxisMarkers implements ChartElement {
 				label.hidden = true;
 				continue;
 			}
-
 
 			label.hidden = false;
 			const labelTrans = this.transform
