@@ -38,11 +38,11 @@ function main() {
 		showWalls,
 		showFloor,
 		showCeiling,
-		gridSize: [10, 20],
+		gridSize: [20, 20],
 		axes: {
 			x: {
 				label: 'Foo',
-				range: [10, 100],
+				range: [100, 1000],
 				position: 1.0,
 			},
 			y: {

@@ -244,7 +244,8 @@ export class Chart {
 				this,
 				Axis.X,
 				LabelAnchor.RIGHT,
-				scale.multiply(Matrix4.translation(0.0, options?.axes?.x?.position || 0, 0.02))
+				scale.multiply(Matrix4.translation(0.0, options?.axes?.x?.position || 0, 0.02)),
+				options?.axes?.x?.range
 			)
 		);
 		this._elements.push(
@@ -252,7 +253,8 @@ export class Chart {
 				this,
 				Axis.X,
 				LabelAnchor.LEFT,
-				scale.multiply(Matrix4.translation(0.0, options?.axes?.x?.position || 0, -1.02))
+				scale.multiply(Matrix4.translation(0.0, options?.axes?.x?.position || 0, -1.02)),
+				options?.axes?.x?.range
 			)
 		);
 
@@ -264,7 +266,8 @@ export class Chart {
 				LabelAnchor.RIGHT,
 				scale
 					.multiply(Matrix4.rotation(0, -Math.PI / 2, 0))
-					.multiply(Matrix4.translation(0.0, options?.axes?.z?.position || 0, 0.02))
+					.multiply(Matrix4.translation(0.0, options?.axes?.z?.position || 0, 0.02)),
+				options?.axes?.z?.range
 			)
 		);
 		this._elements.push(
@@ -274,7 +277,8 @@ export class Chart {
 				LabelAnchor.LEFT,
 				scale
 					.multiply(Matrix4.rotation(0, -Math.PI / 2, 0))
-					.multiply(Matrix4.translation(0.0, options?.axes?.z?.position || 0, -1.02))
+					.multiply(Matrix4.translation(0.0, options?.axes?.z?.position || 0, -1.02)),
+				options?.axes?.z?.range
 			)
 		);
 
@@ -440,7 +444,11 @@ export class Chart {
 	}
 
 	get dataHeight(): number {
-		return this._data.length / this._dataWidth;
+		if (this._data) {
+			return this._data.length / this._dataWidth;
+		} else {
+			return 0;
+		}
 	}
 
 	get gridSize(): [number, number] {

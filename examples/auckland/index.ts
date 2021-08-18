@@ -34,6 +34,10 @@ function main() {
 		resolution: 512,
 		gradient: COLORS,
 		showContours: true,
+		axes: {
+			x: { position: 0.5 },
+			z: { position: 0.5 },
+		},
 	});
 	chart.attach('#example-graph');
 }

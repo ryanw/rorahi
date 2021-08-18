@@ -1,5 +1,5 @@
 import { Chart, ChartElement } from '../chart';
-import { Matrix4, Vector2 } from '../geom';
+import { Matrix4 } from '../geom';
 import { Camera } from '../camera';
 import { createFace } from '../meshes';
 import { Program } from '../program';
@@ -7,17 +7,30 @@ import { Label, LabelAlign } from './label';
 import MarkersVertexShader from '../shaders/markers.vert.glsl';
 import MarkersFragmentShader from '../shaders/markers.frag.glsl';
 
+function remap(value: number, low0: number, high0: number, low1: number, high1: number): number {
+	return low1 + ((high1 - low1) * (value - low0)) / (high0 - low0);
+}
+
+/**
+ * Which axis this {@link AxisMarkers} is for
+ */
 export enum Axis {
 	X = 0,
 	Y,
 	Z,
 }
 
+/**
+ * How to align the text used in the value labels
+ */
 export enum LabelAnchor {
 	LEFT,
 	RIGHT,
 }
 
+/**
+ * Value labels and marker lines drawn along the edges of the chart
+ */
 export class AxisMarkers implements ChartElement {
 	private _positionBuffer: WebGLBuffer;
 	private _program: Program;
@@ -27,11 +40,19 @@ export class AxisMarkers implements ChartElement {
 	private _tickLimit = 8;
 	private _labels: Label[] = [];
 	private _labelAnchor: LabelAnchor;
+	private _range: [number, number];
 	transform: Matrix4 = Matrix4.identity();
 
-	constructor(chart: Chart, axis: Axis, labelAnchor: LabelAnchor = LabelAnchor.LEFT, transform?: Matrix4) {
+	constructor(
+		chart: Chart,
+		axis: Axis,
+		labelAnchor: LabelAnchor = LabelAnchor.LEFT,
+		transform?: Matrix4,
+		range?: [number, number]
+	) {
 		this._chart = chart;
 		this._axis = axis;
+		this._range = range ? [...range] : null;
 		if (transform) {
 			this.transform = transform;
 		}
@@ -101,9 +122,29 @@ export class AxisMarkers implements ChartElement {
 		}
 	}
 
+	get range(): [number, number] {
+		if (!this._range) {
+			switch (this._axis) {
+				case Axis.X: {
+					return [0, this._chart.dataWidth];
+				}
+
+				case Axis.Y: {
+					// TODO
+				}
+
+				case Axis.Z: {
+					return [0, this._chart.dataHeight];
+				}
+			}
+		} else {
+			return this._range;
+		}
+	}
+
 	private updateLabels() {
-		const region = this._chart.region;
-		const spacing = this.spacing;
+		const { dataWidth, dataHeight, region } = this._chart;
+		const { spacing, range } = this;
 		const gridSize = [(1.0 / region[2]) * spacing, (1.0 / region[3]) * spacing];
 
 		for (let i = 0; i < this._labels.length; i++) {
@@ -112,15 +153,23 @@ export class AxisMarkers implements ChartElement {
 			let y = -0.49;
 
 			switch (this._axis) {
-				case Axis.X:
-					label.text = Math.floor(Math.floor(region[0] / spacing) * spacing + i * spacing).toString();
+				case Axis.X: {
+					const value = Math.floor(Math.floor(region[0] / spacing) * spacing + i * spacing);
+					label.text = remap(value, 0, dataWidth, range[0], range[1]).toString();
 					x = -0.5 - (region[0] % spacing) / region[2] + i * gridSize[0];
 					break;
+				}
 
-				case Axis.Z:
-					label.text = Math.floor(Math.floor(region[1] / spacing) * spacing + i * spacing).toString();
+				case Axis.Y: {
+					// TODO
+				}
+
+				case Axis.Z: {
+					const value = Math.floor(Math.floor(region[1] / spacing) * spacing + i * spacing);
+					label.text = remap(value, 0, dataHeight, range[0], range[1]).toString();
 					x = -0.5 - (region[1] % spacing) / region[3] + i * gridSize[1];
 					break;
+				}
 			}
 			// If outside the chart, hide it
 			if (x < -0.51 || x > 0.51) {

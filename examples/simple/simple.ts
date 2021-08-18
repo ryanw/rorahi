@@ -25,6 +25,10 @@ function main() {
 		dataWidth: SIZE,
 		dataRange: [-1, 1],
 		height: 0.5,
+		axes: {
+			x: { position: 0.5 },
+			z: { position: 0.5 },
+		},
 	});
 
 	let t = 0;
