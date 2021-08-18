@@ -11,6 +11,7 @@ type ExtWheelEvent = WheelEvent & { wheelDelta: number; axis: number; HORIZONTAL
 export interface AxisOptions {
 	label?: string;
 	range?: [number, number];
+	position?: number;
 }
 
 export interface ChartOptions {
@@ -173,10 +174,20 @@ export class Chart {
 
 		// X axis
 		this._elements.push(
-			new AxisMarkers(this, Axis.X, LabelAnchor.RIGHT, scale.multiply(Matrix4.translation(0.0, 0.5, 0.02)))
+			new AxisMarkers(
+				this,
+				Axis.X,
+				LabelAnchor.RIGHT,
+				scale.multiply(Matrix4.translation(0.0, options?.axes?.x?.position || 0, 0.02))
+			)
 		);
 		this._elements.push(
-			new AxisMarkers(this, Axis.X, LabelAnchor.LEFT, scale.multiply(Matrix4.translation(0.0, 0.5, -1.02)))
+			new AxisMarkers(
+				this,
+				Axis.X,
+				LabelAnchor.LEFT,
+				scale.multiply(Matrix4.translation(0.0, options?.axes?.x?.position || 0, -1.02))
+			)
 		);
 
 		// Z axis (forward)
@@ -185,7 +196,9 @@ export class Chart {
 				this,
 				Axis.Z,
 				LabelAnchor.RIGHT,
-				scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.5, 0.02))
+				scale
+					.multiply(Matrix4.rotation(0, -Math.PI / 2, 0))
+					.multiply(Matrix4.translation(0.0, options?.axes?.z?.position || 0, 0.02))
 			)
 		);
 		this._elements.push(
@@ -193,7 +206,9 @@ export class Chart {
 				this,
 				Axis.Z,
 				LabelAnchor.LEFT,
-				scale.multiply(Matrix4.rotation(0, -Math.PI / 2, 0)).multiply(Matrix4.translation(0.0, 0.5, -1.02))
+				scale
+					.multiply(Matrix4.rotation(0, -Math.PI / 2, 0))
+					.multiply(Matrix4.translation(0.0, options?.axes?.z?.position || 0, -1.02))
 			)
 		);
 

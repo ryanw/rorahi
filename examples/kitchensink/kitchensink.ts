@@ -43,6 +43,7 @@ function main() {
 			x: {
 				label: 'Foo',
 				range: [10, 100],
+				position: 1.0,
 			},
 			y: {
 				label: 'Bar',
@@ -51,6 +52,7 @@ function main() {
 			z: {
 				label: 'Woop',
 				range: [-100, 100],
+				position: 1.0,
 			},
 		},
 		gradient: new Gradient(colors, smooth),
