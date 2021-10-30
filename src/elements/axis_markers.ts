@@ -3,6 +3,7 @@ import { Matrix4 } from '../geom';
 import { Camera } from '../camera';
 import { createFace } from '../meshes';
 import { Program } from '../program';
+import { RGB } from '../color';
 import { Label, LabelAlign } from './label';
 import MarkersVertexShader from '../shaders/markers.vert.glsl';
 import MarkersFragmentShader from '../shaders/markers.frag.glsl';
@@ -48,7 +49,8 @@ export class AxisMarkers implements ChartElement {
 		axis: Axis,
 		labelAnchor: LabelAnchor = LabelAnchor.LEFT,
 		transform?: Matrix4,
-		range?: [number, number]
+		range?: [number, number],
+		color?: RGB
 	) {
 		this._chart = chart;
 		this._axis = axis;
@@ -63,7 +65,7 @@ export class AxisMarkers implements ChartElement {
 				text: `${i}`,
 				fontSize: 16,
 				orthographic: true,
-				color: [1.0, 0.0, 0.0],
+				color: color || [1.0, 0.0, 0.0],
 				align: labelAnchor === LabelAnchor.LEFT ? LabelAlign.LEFT : LabelAlign.RIGHT,
 			});
 			this._labels.push(label);
