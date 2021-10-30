@@ -2,28 +2,11 @@ import { Matrix4, Point2, Point3, Rect } from './geom';
 import { Camera } from './camera';
 import { Heightmap } from './elements/heightmap';
 import { Walls } from './elements/walls';
-import { AxisMarkers, Axis, LabelAnchor } from './elements/axis_markers';
+import { AxisMarkersCollection, AxisOptions } from './elements/axis_markers_collection';
 import { RGB } from './color';
 import { Gradient } from './gradient';
 
 type ExtWheelEvent = WheelEvent & { wheelDelta: number; axis: number; HORIZONTAL_AXIS: 0x01; VERTICAL_AXIS: 0x02 };
-
-export interface AxisOptions {
-	label?: string;
-	range?: [number, number];
-
-	/**
-	 * The color of the text next to each tick
-	 */
-	tickFontColor?: RGB;
-
-	/**
-	 * For X and Z axes; how far up the Y axis to draw the markers.
-	 * For the Y axis; how far along the X and Z axes to draw the markers.
-	 * Values range from 0.0 for the start, and 1.0 for the end
-	 */
-	position?: number;
-}
 
 /**
  * Configuration options for the {@link Chart}.
@@ -245,78 +228,37 @@ export class Chart {
 			}
 		}
 
-		const scale = Matrix4.scaling(this._width, this._height, this._depth);
-		// Heightmap visualisation
+		this.initElements(options);
+	}
+
+	private initElements(options?: ChartOptions) {
+		this.initHeightmap();
+		this.initWalls();
+		this.initAxisMarkers(options);
+	}
+
+	private initHeightmap() {
+		const scale = this.scaleMatrix;
 		const heightmap = new Heightmap(this, this._resolution);
 		heightmap.transform = scale.multiply(Matrix4.rotation(-Math.PI / 2, 0, 0));
 		this._elements.push(heightmap);
 		this._heightmap = heightmap;
+	}
 
-		// Walls
+	private initWalls() {
 		const walls = new Walls(this);
-		walls.transform = scale.clone();
+		walls.transform = this.scaleMatrix;
 		walls.hidden = !this._showWalls;
 		this._elements.push(walls);
+	}
 
-		// X axis
-		this._elements.push(
-			new AxisMarkers(
-				this,
-				Axis.X,
-				LabelAnchor.RIGHT,
-				scale.multiply(Matrix4.translation(0.0, options?.axes?.x?.position || 0, 0.02)),
-				options?.axes?.x?.range,
-				options?.axes?.x?.tickFontColor
-			)
-		);
-		this._elements.push(
-			new AxisMarkers(
-				this,
-				Axis.X,
-				LabelAnchor.LEFT,
-				scale.multiply(Matrix4.translation(0.0, options?.axes?.x?.position || 0, -1.02)),
-				options?.axes?.x?.range,
-				options?.axes?.x?.tickFontColor
-			)
-		);
+	private initAxisMarkers(options?: ChartOptions) {
+		const markers = new AxisMarkersCollection(this, { axes: options?.axes });
+		this._elements.push(markers);
+	}
 
-		// Z axis (forward)
-		this._elements.push(
-			new AxisMarkers(
-				this,
-				Axis.Z,
-				LabelAnchor.RIGHT,
-				scale
-					.multiply(Matrix4.rotation(0, -Math.PI / 2, 0))
-					.multiply(Matrix4.translation(0.0, options?.axes?.z?.position || 0, 0.02)),
-				options?.axes?.z?.range,
-				options?.axes?.z?.tickFontColor
-			)
-		);
-		this._elements.push(
-			new AxisMarkers(
-				this,
-				Axis.Z,
-				LabelAnchor.LEFT,
-				scale
-					.multiply(Matrix4.rotation(0, -Math.PI / 2, 0))
-					.multiply(Matrix4.translation(0.0, options?.axes?.z?.position || 0, -1.02)),
-				options?.axes?.z?.range,
-				options?.axes?.z?.tickFontColor
-			)
-		);
-
-		// Y axis (up)
-		this._elements.push(
-			new AxisMarkers(
-				this,
-				Axis.Y,
-				LabelAnchor.RIGHT,
-				scale.multiply(Matrix4.rotation(0, 0, -Math.PI / 2)).multiply(Matrix4.translation(0.0, 0.0, 0.02)),
-				options?.axes?.y?.range,
-				options?.axes?.y?.tickFontColor
-			)
-		);
+	get scaleMatrix(): Matrix4 {
+		return Matrix4.scaling(this._width, this._height, this._depth);
 	}
 
 	get gl(): WebGLRenderingContext | null {

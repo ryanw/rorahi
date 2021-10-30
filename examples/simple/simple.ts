@@ -1,4 +1,4 @@
-import { Chart, Gradient } from 'rorahi';
+import { Chart } from 'rorahi';
 
 const SIZE = 100;
 const SCALE = 0.2;

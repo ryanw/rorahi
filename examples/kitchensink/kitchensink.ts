@@ -11,17 +11,18 @@ function hexToColor(hex: string): [number, number, number] {
 
 const SIZE = 200;
 function main() {
-	const width = parseFloat((document.querySelector('#x-scale') as HTMLInputElement).value);
-	const height = parseFloat((document.querySelector('#y-scale') as HTMLInputElement).value);
-	const xOffset = parseFloat((document.querySelector('#x-offset') as HTMLInputElement).value);
-	const yOffset = parseFloat((document.querySelector('#y-offset') as HTMLInputElement).value);
-	const resolution = parseFloat((document.querySelector('#resolution') as HTMLInputElement).value);
-	const smooth = (document.querySelector('#smooth') as HTMLInputElement).checked;
-	const showContours = (document.querySelector('#contours') as HTMLInputElement).checked;
-	const showGrid = (document.querySelector('#grid') as HTMLInputElement).checked;
-	const showWalls = (document.querySelector('#walls') as HTMLInputElement).checked;
-	const showFloor = (document.querySelector('#floor') as HTMLInputElement).checked;
-	const showCeiling = (document.querySelector('#ceiling') as HTMLInputElement).checked;
+	const qs = document.querySelector.bind(document);
+	const width = parseFloat((qs('#x-scale') as HTMLInputElement).value);
+	const height = parseFloat((qs('#y-scale') as HTMLInputElement).value);
+	const xOffset = parseFloat((qs('#x-offset') as HTMLInputElement).value);
+	const yOffset = parseFloat((qs('#y-offset') as HTMLInputElement).value);
+	const resolution = parseFloat((qs('#resolution') as HTMLInputElement).value);
+	const smooth = (qs('#smooth') as HTMLInputElement).checked;
+	const showContours = (qs('#contours') as HTMLInputElement).checked;
+	const showGrid = (qs('#grid') as HTMLInputElement).checked;
+	const showWalls = (qs('#walls') as HTMLInputElement).checked;
+	const showFloor = (qs('#floor') as HTMLInputElement).checked;
+	const showCeiling = (qs('#ceiling') as HTMLInputElement).checked;
 
 	const colorInputs = Array.from(document.querySelectorAll('.gradient input[type="color"]')) as HTMLInputElement[];
 	const colors = colorInputs.map((input) => hexToColor(input.value));
@@ -38,7 +39,7 @@ function main() {
 		showWalls,
 		showFloor,
 		showCeiling,
-		gridSize: [20, 20],
+		gridSize: [10, 10],
 		axes: {
 			x: {
 				label: 'Foo',
@@ -64,74 +65,74 @@ function main() {
 	chart.attach('#example-graph');
 
 	// Time adjustment
-	document.querySelector('#time-range').addEventListener('input', (e: InputEvent) => {
+	qs('#time-range').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = parseFloat(el.value);
 		chart.data = generateData(0, 0, SIZE, SIZE, value);
 	});
 
-	document.querySelector('#x-scale').addEventListener('input', (e: InputEvent) => {
+	qs('#x-scale').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = parseFloat(el.value);
 		chart.xScale = value;
 	});
 
-	document.querySelector('#y-scale').addEventListener('input', (e: InputEvent) => {
+	qs('#y-scale').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = parseFloat(el.value);
 		chart.yScale = value;
 	});
 
-	document.querySelector('#x-offset').addEventListener('input', (e: InputEvent) => {
+	qs('#x-offset').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = parseFloat(el.value);
 		chart.xOffset = value;
 	});
 
-	document.querySelector('#y-offset').addEventListener('input', (e: InputEvent) => {
+	qs('#y-offset').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = parseFloat(el.value);
 		chart.yOffset = value;
 	});
 
-	document.querySelector('#resolution').addEventListener('input', (e: InputEvent) => {
+	qs('#resolution').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = parseFloat(el.value);
 		chart.resolution = value;
 	});
 
-	document.querySelector('#smooth').addEventListener('input', (e: InputEvent) => {
+	qs('#smooth').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = el.checked;
 		chart.gradient.smooth = value;
 		chart.draw();
 	});
 
-	document.querySelector('#contours').addEventListener('input', (e: InputEvent) => {
+	qs('#contours').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = el.checked;
 		chart.showContours = value;
 	});
 
-	document.querySelector('#grid').addEventListener('input', (e: InputEvent) => {
+	qs('#grid').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = el.checked;
 		chart.showGrid = value;
 	});
 
-	document.querySelector('#walls').addEventListener('input', (e: InputEvent) => {
+	qs('#walls').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = el.checked;
 		chart.showWalls = value;
 	});
 
-	document.querySelector('#floor').addEventListener('input', (e: InputEvent) => {
+	qs('#floor').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = el.checked;
 		chart.showFloor = value;
 	});
 
-	document.querySelector('#ceiling').addEventListener('input', (e: InputEvent) => {
+	qs('#ceiling').addEventListener('input', (e: InputEvent) => {
 		const el = e.target as HTMLInputElement;
 		const value = el.checked;
 		chart.showCeiling = value;
