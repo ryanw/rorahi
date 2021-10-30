@@ -11,6 +11,7 @@ type ExtWheelEvent = WheelEvent & { wheelDelta: number; axis: number; HORIZONTAL
 export interface AxisOptions {
 	label?: string;
 	range?: [number, number];
+
 	/**
 	 * For X and Z axes; how far up the Y axis to draw the markers.
 	 * For the Y axis; how far along the X and Z axes to draw the markers.
@@ -28,60 +29,74 @@ export interface ChartOptions {
 	 * Either a flat Array of 2D data, or a greyscale image
 	 */
 	data?: ArrayLike<number> | HTMLImageElement;
+
 	/**
 	 * How many `data` elements make up a single row in the 2D dataset
 	 */
 	dataWidth?: number;
+
 	/**
 	 * The minimum and maximum values found inside `data`. Used to
 	 * control how high and low the heightmap goes.
 	 */
 	dataRange?: [number, number];
+
 	/**
 	 * How detailed the 3D geometry should be. Higher numbers look
 	 * smoother, but lower numbers perform better.
 	 */
 	resolution?: number;
+
 	/**
 	 * A list of colours to uses for the heightmap
 	 */
 	gradient?: Gradient | RGB[];
+
 	/**
 	 * Which 2D section of the `data` to use to draw the heightmap
 	 */
 	region?: Rect;
+
 	/**
 	 * How wide the 3D heightmap will be drawn
 	 */
 	width?: number;
+
 	/**
 	 * How high (up) the 3D heightmap will be drawn
 	 */
 	height?: number;
+
 	/**
 	 * How deep (forward) the 3D heightmap will be drawn
 	 */
 	depth?: number;
+
 	/**
 	 * Whether to show contour lines on the heightmap
 	 */
 	showContours?: boolean;
+
 	/**
 	 * Whether to show a grid on the heightmap
 	 */
 	showGrid?: boolean;
+
 	/**
 	 * Whether to show walls behind the chart
 	 */
 	showWalls?: boolean;
+
 	/**
 	 * How much spacing there is between grid lines
 	 */
 	gridSize?: number | [number, number];
+
 	/**
 	 * Whether to show a flattened heightmap on the floor
 	 */
 	showFloor?: boolean;
+
 	/**
 	 * Whether to show a flattened heightmap on the ceiling
 	 */
