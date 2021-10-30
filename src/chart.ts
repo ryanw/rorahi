@@ -283,11 +283,15 @@ export class Chart {
 		);
 
 		// Y axis (up)
-		/*
 		this._elements.push(
-			new AxisMarkers(this, Axis.Y, scale.multiply(Matrix4.rotation(0, 0, -Math.PI / 2)).multiply(Matrix4.translation(0.0, 0.0, 0.02)))
+			new AxisMarkers(
+				this,
+				Axis.Y,
+				LabelAnchor.RIGHT,
+				scale.multiply(Matrix4.rotation(0, 0, -Math.PI / 2)).multiply(Matrix4.translation(0.0, 0.0, 0.02)),
+				options?.axes?.y?.range
+			)
 		);
-		*/
 	}
 
 	get gl(): WebGLRenderingContext | null {
@@ -453,6 +457,10 @@ export class Chart {
 
 	get gridSize(): [number, number] {
 		return [this._gridSize[0], this._gridSize[1]];
+	}
+
+	get dataRange(): [number, number] {
+		return this._dataRange.slice() as [number, number];
 	}
 
 	addElement(el: ChartElement) {

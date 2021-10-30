@@ -108,6 +108,9 @@ export class AxisMarkers implements ChartElement {
 				}
 				return grid[0] / interval;
 
+			case Axis.Y:
+				return 1 / this._chart.gradient.length;
+
 			case Axis.Z:
 				interval = (this._tickLimit * grid[1]) / region[3];
 				if (interval >= 1) {
@@ -130,7 +133,7 @@ export class AxisMarkers implements ChartElement {
 				}
 
 				case Axis.Y: {
-					// TODO
+					return this._chart.dataRange;
 				}
 
 				case Axis.Z: {
@@ -161,7 +164,11 @@ export class AxisMarkers implements ChartElement {
 				}
 
 				case Axis.Y: {
-					// TODO
+					const dataRange = this._chart.dataRange;
+					const value = dataRange[0] + i * spacing * (dataRange[1] - dataRange[0]);
+					label.text = remap(value, dataRange[0], dataRange[1], range[0], range[1]).toFixed(0);
+					x = -0.5 + value;
+					break;
 				}
 
 				case Axis.Z: {
@@ -204,7 +211,7 @@ export class AxisMarkers implements ChartElement {
 				break;
 
 			case Axis.Y:
-				prog.setUniform('u_gridSize', 1 / this._chart.gradient.length);
+				prog.setUniform('u_gridSize', spacing);
 				prog.setUniform('u_gridOffset', 0);
 				break;
 
