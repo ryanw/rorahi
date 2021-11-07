@@ -30,8 +30,11 @@ export interface LabelOptions {
 	text: string;
 	align?: LabelAlign;
 	fontSize?: number;
+	fontName?: string;
 	transform?: Matrix4;
 	color?: RGB | RGBA;
+	glowColor?: RGB | RGBA;
+	glowAmount?: number;
 	orthographic?: boolean;
 }
 
@@ -47,6 +50,9 @@ export class Label implements ChartElement {
 	protected _texture: WebGLTexture;
 	protected _textSize = [0, 0];
 	protected _fontSize = 128;
+	protected _fontName = 'sans-serif';
+	protected _glowColor: RGB | RGBA = [1.0, 1.0, 1.0];
+	protected _glowAmount = 0;
 	protected _align = LabelAlign.LEFT;
 	protected _quadHeight = 0.2;
 	protected _color: RGBA = [0.0, 0.0, 0.0, 1.0];
@@ -74,6 +80,12 @@ export class Label implements ChartElement {
 		}
 		if (options.orthographic) {
 			this._orthographic = options.orthographic;
+		}
+		if (options.glowColor) {
+			this._glowColor = options.glowColor;
+		}
+		if (options.glowAmount) {
+			this._glowAmount = options.glowAmount;
 		}
 
 		if (options.color) {
@@ -109,6 +121,15 @@ export class Label implements ChartElement {
 		this.updateQuad();
 	}
 
+	get fontName(): string {
+		return this._fontName;
+	}
+
+	set fontName(name: string) {
+		this._fontName = name;
+		this.updateQuad;
+	}
+
 	private compileShaders(gl: WebGLRenderingContext) {
 		const program = new Program(gl, LabelVertexShader, LabelFragmentShader);
 		program.compile();
@@ -117,11 +138,12 @@ export class Label implements ChartElement {
 
 	private updateTexture() {
 		const fontSize = this.deviceFontSize;
+		const fontName = this.fontName;
 		const gl = this._chart.gl;
 		const pad = (fontSize * 0.2) | 0;
 		const canvas = this._canvas;
 		const ctx = canvas.getContext('2d');
-		ctx.font = `${fontSize}px sans-serif`;
+		ctx.font = `${fontSize}px ${fontName}`;
 		ctx.textBaseline = 'top';
 
 		const size = ctx.measureText(this._text);
@@ -132,9 +154,11 @@ export class Label implements ChartElement {
 
 		canvas.width = imgWidth;
 		canvas.height = imgHeight;
-		ctx.font = `${fontSize}px sans-serif`;
+		ctx.font = `${fontSize}px ${fontName}`;
 		ctx.textBaseline = 'top';
-		ctx.fillStyle = `rgba(${this._color.map((c) => c * 255).join(',')})`;
+		ctx.shadowColor = rgbToCSS(this._glowColor);
+		ctx.shadowBlur = this._glowAmount;
+		ctx.fillStyle = rgbToCSS(this._color);
 		ctx.fillText(this._text, 0, pad);
 		this._textureSize = [imgWidth, imgHeight];
 		this._textSize = [textWidth, textHeight];
@@ -280,5 +304,14 @@ export class Label implements ChartElement {
 		gl.disable(gl.CULL_FACE);
 		gl.cullFace(gl.BACK);
 		gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
+	}
+}
+
+function rgbToCSS(color: RGB | RGBA): string {
+	const ch = color.map((c) => c * 255).join(',');
+	if (color.length === 3) {
+		return `rgb(${ch})`;
+	} else {
+		return `rgba(${ch})`;
 	}
 }

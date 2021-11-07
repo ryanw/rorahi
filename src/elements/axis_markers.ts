@@ -66,6 +66,8 @@ export class AxisMarkers implements ChartElement {
 				fontSize: 16,
 				orthographic: true,
 				color: color || [1.0, 0.0, 0.0],
+				glowAmount: 1,
+				glowColor: [1.0, 1.0, 1.0],
 				align: labelAnchor === LabelAnchor.LEFT ? LabelAlign.LEFT : LabelAlign.RIGHT,
 			});
 			this._labels.push(label);

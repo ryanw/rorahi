@@ -11,6 +11,8 @@ export class VerticalAxisLabel extends Label {
 			fontSize: 24,
 			orthographic: false,
 			color: [0.0, 0.0, 0.0],
+			glowAmount: 1,
+			glowColor: [1.0, 1.0, 1.0],
 			align: LabelAlign.CENTER,
 			...options,
 		});

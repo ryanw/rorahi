@@ -12,6 +12,8 @@ export class HorizontalAxisLabel extends Label {
 			orthographic: false,
 			color: [0.0, 0.0, 0.0],
 			align: LabelAlign.CENTER,
+			glowAmount: 1,
+			glowColor: [1.0, 1.0, 1.0],
 			...options,
 		});
 	}
