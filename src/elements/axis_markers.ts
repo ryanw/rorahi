@@ -190,7 +190,7 @@ export class AxisMarkers implements ChartElement {
 
 			label.hidden = false;
 			const labelTrans = this.transform
-				.multiply(Matrix4.translation(x, y, this._labelAnchor === LabelAnchor.LEFT ? 0.475 : 0.525))
+				.multiply(Matrix4.translation(x, y, this._labelAnchor === LabelAnchor.LEFT ? 0.45 : 0.55))
 				.multiply(Matrix4.rotation(0, 0, Math.PI / 2))
 				.multiply(Matrix4.rotation(0, Math.PI / 2, 0));
 

@@ -232,12 +232,12 @@ export class Label implements ChartElement {
 			const h = fontHeight;
 			// prettier-ignore
 			const offsets = new Float32Array([
-				-w, 0,
-				-w, -h * 2,
-				w, 0,
-				w, -h * 2,
-				w, 0,
-				-w, -h * 2,
+				-w, h,
+				-w, -h,
+				w, h,
+				w, -h,
+				w, h,
+				-w, -h,
 			]);
 			gl.bindBuffer(gl.ARRAY_BUFFER, this._offsetBuffer);
 			gl.bufferData(gl.ARRAY_BUFFER, offsets, gl.STATIC_DRAW);
@@ -301,7 +301,7 @@ export class Label implements ChartElement {
 
 		const vertexCount = 6;
 
-		gl.disable(gl.CULL_FACE);
+		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.BACK);
 		gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
 	}
