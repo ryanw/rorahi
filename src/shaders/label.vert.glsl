@@ -10,18 +10,18 @@ attribute vec2 uv;
 varying vec2 v_uv;
 
 void main(void) {
+	mat4 mv = u_model * u_view;
+	mat4 mvp = mv * u_projection;
 	v_uv = uv;
 	if (u_orthgraphic) {
-		mat4 mvp = u_model * u_view * u_projection;
-		vec4 pos4 = vec4(position, 1.0) * mvp;
-		vec3 pos3 = pos4.xyz / pos4.w;
-		pos3.x += offset.x;
-		pos3.y += offset.y;
-		gl_Position = vec4(pos3, 1.0);
+		vec4 pos = vec4(position, 1.0) * mvp;
+		pos.xy += offset * pos.w;
+		gl_Position = pos;
 	}
 	else {
-		mat4 mvp = u_model * u_view * u_projection;
-		vec4 pos = vec4(position, 1.0) * mvp;
+		vec4 center = vec4(vec3(0.0), 1.0) * mv;
+		float scale = length(center);
+		vec4 pos = vec4(position * scale, 1.0) * mvp;
 		gl_Position = pos;
 	}
 }

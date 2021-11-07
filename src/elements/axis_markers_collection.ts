@@ -3,6 +3,9 @@ import { RGB } from '../color';
 import { Matrix4 } from '../geom';
 import { Camera } from '../camera';
 import { AxisMarkers, Axis, LabelAnchor } from './axis_markers';
+import { HorizontalAxisLabel } from './horizontal_axis_label';
+import { VerticalAxisLabel } from './vertical_axis_label';
+import { Label } from './label';
 
 export interface AxisOptions {
 	label?: string;
@@ -32,12 +35,59 @@ export interface Options {
 export class AxisMarkersCollection implements ChartElement {
 	private _chart: Chart;
 	private _axisMarkers: Array<AxisMarkers>;
+	private _axisLabels: Array<Label>;
 	hidden = false;
 
 	constructor(chart: Chart, options?: Options) {
 		this._chart = chart;
 		this._axisMarkers = [];
+		this._axisLabels = [];
 		this.initMarkers(options);
+		this.initLabels(options);
+	}
+
+	private initLabels(options?: Options) {
+		let label: Label;
+		if (options?.axes?.x?.label) {
+			label = new HorizontalAxisLabel(this._chart, {
+				text: options.axes.x.label,
+				transform: Matrix4.translation(0, -0.5, 0.7),
+			});
+			this._axisLabels.push(label);
+			this._chart.addElement(label);
+
+			label = new HorizontalAxisLabel(this._chart, {
+				text: options.axes.x.label,
+				transform: Matrix4.translation(0, -0.5, -0.7).multiply(Matrix4.rotation(0, Math.PI, 0)),
+			});
+			this._axisLabels.push(label);
+			this._chart.addElement(label);
+		}
+
+		if (options?.axes?.y?.label) {
+			label = new VerticalAxisLabel(this._chart, {
+				text: options.axes.y.label,
+				transform: Matrix4.translation(-0.5, 0.0, 0.7).multiply(Matrix4.rotation(0, 0, -Math.PI / 2)),
+			});
+			this._axisLabels.push(label);
+			this._chart.addElement(label);
+		}
+
+		if (options?.axes?.z?.label) {
+			label = new HorizontalAxisLabel(this._chart, {
+				text: options.axes.z.label,
+				transform: Matrix4.translation(0.7, -0.5, 0.0).multiply(Matrix4.rotation(0, Math.PI / 2, 0)),
+			});
+			this._axisLabels.push(label);
+			this._chart.addElement(label);
+
+			label = new HorizontalAxisLabel(this._chart, {
+				text: options.axes.z.label,
+				transform: Matrix4.translation(-0.7, -0.5, 0.0).multiply(Matrix4.rotation(0, -Math.PI / 2, 0)),
+			});
+			this._axisLabels.push(label);
+			this._chart.addElement(label);
+		}
 	}
 
 	private initMarkers(options?: Options) {

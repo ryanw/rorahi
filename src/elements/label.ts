@@ -1,5 +1,5 @@
 import { Chart, ChartElement } from '../chart';
-import { Matrix4 } from '../geom';
+import { Matrix4, Vector3 } from '../geom';
 import { Camera } from '../camera';
 import { Program } from '../program';
 import { createQuad } from '../meshes';
@@ -39,21 +39,22 @@ export interface LabelOptions {
 const PROGRAMS: Map<WebGLRenderingContext, Program> = new Map();
 
 export class Label implements ChartElement {
-	private _positionBuffer: WebGLBuffer;
-	private _offsetBuffer: WebGLBuffer;
-	private _uvBuffer: WebGLBuffer;
-	private _text: string;
-	private _textureSize = [0, 0];
-	private _texture: WebGLTexture;
-	private _textSize = [0, 0];
-	private _fontSize = 128;
-	private _align = LabelAlign.LEFT;
-	private _quadHeight = 0.2;
-	private _color: RGBA = [0.0, 0.0, 0.0, 1.0];
-	private _orthographic = false;
-	private _chart: Chart;
-	private _canvas = document.createElement('canvas');
-	private _previousCameraSize: [number, number] = [0, 0];
+	protected _positionBuffer: WebGLBuffer;
+	protected _offsetBuffer: WebGLBuffer;
+	protected _uvBuffer: WebGLBuffer;
+	protected _text: string;
+	protected _textureSize = [0, 0];
+	protected _texture: WebGLTexture;
+	protected _textSize = [0, 0];
+	protected _fontSize = 128;
+	protected _align = LabelAlign.LEFT;
+	protected _quadHeight = 0.2;
+	protected _color: RGBA = [0.0, 0.0, 0.0, 1.0];
+	protected _rotation: Vector3 = [0.0, 0.0, 0.0];
+	protected _orthographic = false;
+	protected _chart: Chart;
+	protected _canvas = document.createElement('canvas');
+	protected _previousCameraSize: [number, number] = [0, 0];
 	hidden: boolean = false;
 	transform = Matrix4.identity();
 
@@ -74,6 +75,7 @@ export class Label implements ChartElement {
 		if (options.orthographic) {
 			this._orthographic = options.orthographic;
 		}
+
 		if (options.color) {
 			if (options.color.length === 3) {
 				this._color = [...options.color, 1.0];
@@ -216,6 +218,8 @@ export class Label implements ChartElement {
 			gl.bindBuffer(gl.ARRAY_BUFFER, this._offsetBuffer);
 			gl.bufferData(gl.ARRAY_BUFFER, offsets, gl.STATIC_DRAW);
 		} else {
+			// Perspective
+
 			const positions = createQuad([0, 0, 1], Matrix4.scaling(ratio * this._quadHeight, this._quadHeight, 1.0));
 			gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -253,7 +257,7 @@ export class Label implements ChartElement {
 		// Scale quad to fit font
 		const scale = this.deviceFontSize * 0.002;
 		const ratio = this._textSize[0] / this._textSize[1];
-		let trans = this.transform;
+		let trans = this.transform.multiply(Matrix4.rotation(this._rotation[0], this._rotation[1], this._rotation[2]));
 		trans = trans.multiply(Matrix4.scaling(scale, scale, 1));
 		switch (this._align) {
 			case LabelAlign.LEFT:
@@ -273,7 +277,7 @@ export class Label implements ChartElement {
 
 		const vertexCount = 6;
 
-		gl.enable(gl.CULL_FACE);
+		gl.disable(gl.CULL_FACE);
 		gl.cullFace(gl.BACK);
 		gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
 	}

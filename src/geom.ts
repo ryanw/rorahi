@@ -426,6 +426,14 @@ export function distanceVector3(vec: Vector3, other: Vector3): number {
 	return Math.abs(magnitude(diff));
 }
 
+export function angleBetween3(p0: Point3, p1: Point3): number {
+	const d = dot(p0, p1);
+	const l0 = magnitude(p0);
+	const l1 = magnitude(p1);
+
+	return Math.acos(d / (l0 * l1));
+}
+
 export function cross(p0: Vector3, p1: Vector3): Vector3 {
 	const x = p0[1] * p1[2] - p0[2] * p1[1];
 	const y = p0[2] * p1[0] - p0[0] * p1[2];

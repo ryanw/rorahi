@@ -42,22 +42,22 @@ function main() {
 		gridSize: [10, 10],
 		axes: {
 			x: {
-				label: 'Foo',
+				label: 'Some Values',
 				range: [100, 1000],
 				position: 0.0,
 				tickFontColor: hexToColor('#0000ff'),
 			},
 			y: {
-				label: 'Bar',
+				label: 'How big',
 				range: [40, 1000],
 				position: 1.0,
 				tickFontColor: [1.0, 0.0, 0.0],
 			},
 			z: {
-				label: 'Woop',
+				label: 'Thingies',
 				range: [-100, 100],
 				position: 0.0,
-				tickFontColor: [1.0, 0.4, 0.0],
+				tickFontColor: [0.0, 0.4, 0.0],
 			},
 		},
 		gradient: new Gradient(colors, smooth),

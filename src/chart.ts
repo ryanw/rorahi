@@ -147,7 +147,7 @@ export class Chart {
 	private _showFloor = false;
 	private _showCeiling = false;
 	gradient: Gradient;
-	camera = new Camera({ rotation: [Math.PI / 4, -Math.PI / 6], distance: 2 });
+	camera = new Camera({ rotation: [Math.PI / 4, -Math.PI / 6], distance: 3 });
 
 	constructor(options?: ChartOptions) {
 		this._canvas = document.createElement('canvas');
