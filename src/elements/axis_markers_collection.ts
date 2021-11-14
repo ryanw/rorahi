@@ -1,4 +1,5 @@
-import { Chart, ChartElement } from '../chart';
+import { ChartElement } from '../chart';
+import { SurfaceChart } from '../surface_chart';
 import { RGB } from '../color';
 import { Matrix4 } from '../geom';
 import { Camera } from '../camera';
@@ -33,12 +34,12 @@ export interface Options {
 }
 
 export class AxisMarkersCollection implements ChartElement {
-	private _chart: Chart;
+	private _chart: SurfaceChart;
 	private _axisMarkers: Array<AxisMarkers>;
 	private _axisLabels: Array<Label>;
 	hidden = false;
 
-	constructor(chart: Chart, options?: Options) {
+	constructor(chart: SurfaceChart, options?: Options) {
 		this._chart = chart;
 		this._axisMarkers = [];
 		this._axisLabels = [];

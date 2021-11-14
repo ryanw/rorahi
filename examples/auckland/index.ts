@@ -1,4 +1,4 @@
-import { Chart, Gradient } from 'rorahi';
+import { SurfaceChart, Gradient } from 'rorahi';
 
 const COLORS = new Gradient(
 	[
@@ -28,7 +28,7 @@ function main() {
 	const elevation = new Image();
 	elevation.src = 'elevation.png';
 
-	const chart = new Chart({
+	const chart = new SurfaceChart({
 		data: elevation,
 		height: 0.2,
 		resolution: 512,

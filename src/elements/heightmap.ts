@@ -1,4 +1,5 @@
-import { Chart, ChartElement } from '../chart';
+import { ChartElement } from '../chart';
+import { SurfaceChart } from '../surface_chart';
 import { Matrix4 } from '../geom';
 import { Camera } from '../camera';
 import { Program } from '../program';
@@ -11,12 +12,12 @@ export class Heightmap implements ChartElement {
 	private _resolution: number;
 	private _program: Program;
 	private _heightTexture: WebGLTexture;
-	private _chart: Chart;
+	private _chart: SurfaceChart;
 	private _useFloatTextures: boolean = false;
 	private _useLinearFilter: boolean = true;
 	transform: Matrix4 = Matrix4.identity();
 
-	constructor(chart: Chart, resolution: number) {
+	constructor(chart: SurfaceChart, resolution: number) {
 		if (resolution < 1) {
 			throw `Heightmap must have resolution > 0`;
 		}

@@ -6,16 +6,22 @@ import { Program } from '../program';
 import WallsVertexShader from '../shaders/walls.vert.glsl';
 import WallsFragmentShader from '../shaders/walls.frag.glsl';
 
+export interface WallsOptions {
+	intervalCount?: number;
+}
+
 export class Walls implements ChartElement {
 	private _positionBuffer: WebGLBuffer;
 	private _barycentricBuffer: WebGLBuffer;
 	private _program: Program;
-	private _chart: Chart;
+	private _intervalCount: number = 5;
 	hidden = false;
 	transform = Matrix4.identity();
 
-	constructor(chart: Chart) {
-		this._chart = chart;
+	constructor(options: WallsOptions) {
+		if (options?.intervalCount != null) {
+			this._intervalCount = options.intervalCount;
+		}
 	}
 
 	private compileShaders(gl: WebGLRenderingContext) {
@@ -51,8 +57,6 @@ export class Walls implements ChartElement {
 		const prog = this._program;
 		prog.use();
 
-		const colors = this._chart.gradient.colors;
-
 		// attribute vec3 position
 		prog.bindPositionBuffer(this._positionBuffer);
 
@@ -63,7 +67,7 @@ export class Walls implements ChartElement {
 		prog.setCamera(camera);
 		prog.setUniform('u_model', this.transform);
 
-		prog.setUniform('u_intervalCount', colors.length, gl.INT);
+		prog.setUniform('u_intervalCount', this._intervalCount, gl.INT);
 
 		const vertexCount = 6 * 4;
 

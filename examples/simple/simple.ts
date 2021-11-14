@@ -1,4 +1,4 @@
-import { Chart } from 'rorahi';
+import { SurfaceChart } from 'rorahi';
 
 const SIZE = 100;
 const SCALE = 0.2;
@@ -20,7 +20,7 @@ function generateData(t: number = 0): Float32Array {
 }
 
 function main() {
-	const chart = new Chart({
+	const chart = new SurfaceChart({
 		data: generateData(),
 		dataWidth: SIZE,
 		dataRange: [-1, 1],

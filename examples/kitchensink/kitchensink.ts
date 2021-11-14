@@ -1,4 +1,4 @@
-import { Chart, Gradient } from 'rorahi';
+import { SurfaceChart, Gradient } from 'rorahi';
 import SimplexNoise from '../simplex-noise';
 
 function hexToColor(hex: string): [number, number, number] {
@@ -28,7 +28,7 @@ function main() {
 	const colors = colorInputs.map((input) => hexToColor(input.value));
 
 	const data = generateData(0, 0, SIZE, SIZE, 1.0);
-	const chart = new Chart({
+	const chart = new SurfaceChart({
 		data,
 		dataWidth: SIZE,
 		dataRange: [0.0, 1.0],

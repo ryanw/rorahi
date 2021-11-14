@@ -10,6 +10,7 @@ module.exports = {
 		'example.kitchensink': './examples/kitchensink/kitchensink.ts',
 		'example.simple': './examples/simple/simple.ts',
 		'example.auckland': './examples/auckland/index.ts',
+		'example.plots': './examples/plots/index.ts',
 	},
 	output: {
 		filename: '[name].js',

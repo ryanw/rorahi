@@ -1,4 +1,5 @@
 import { Chart, ChartElement } from '../chart';
+import { SurfaceChart } from '../surface_chart';
 import { Matrix4 } from '../geom';
 import { Camera } from '../camera';
 import { createFace } from '../meshes';
@@ -35,7 +36,7 @@ export enum LabelAnchor {
 export class AxisMarkers implements ChartElement {
 	private _positionBuffer: WebGLBuffer;
 	private _program: Program;
-	private _chart: Chart;
+	private _chart: SurfaceChart;
 	private _axis: Axis;
 	private _labelCount = 10;
 	private _tickLimit = 8;
@@ -45,7 +46,7 @@ export class AxisMarkers implements ChartElement {
 	transform: Matrix4 = Matrix4.identity();
 
 	constructor(
-		chart: Chart,
+		chart: SurfaceChart,
 		axis: Axis,
 		labelAnchor: LabelAnchor = LabelAnchor.LEFT,
 		transform?: Matrix4,
